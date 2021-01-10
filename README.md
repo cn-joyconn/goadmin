@@ -42,17 +42,8 @@ go build main.go 将自动下载依赖包
 #### 使用说明
 
 1.  访问`/后台地址/index/index`，。
-2.  超级管理员账号为conf/defuser.yml中superAdmin=true的账号
-3.  默认超级管理员的密码为`super_admin`
+2.  超级管理员账号为conf/admin.yml中superAdmin=true的账号
+3.  默认超级管理员的密码为`admin123`
 4.  [日志配置](lib/log/readme.md)
 
-#### 参与贡献
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-## License ##
-MIT License

@@ -72,19 +72,14 @@ func InitDB() {
 
 	defaultOrm.DB = db
 
-	// //开启日志
-	// if global.DBConf.DBLog {
-	// 	db.LogMode(true)
-	// }
-	//create table
-	// orm.RunSyncdb("default", false, true)
 	InitAdminUser()
 }
 
-//初始化
+//初始化管理员及默认用户
 func InitAdminUser() {
 	defaultOrm.DB.AutoMigrate(&admin.AdminUser{})
 	var adminUsers = global.GetSuperAdminUsers()
+	needSaveAdminConfig := false
 	for i, userObj := range global.Admins.Users {
 		if userObj.ID < 1 {
 			adminUser := &admin.AdminUser{}
@@ -93,15 +88,19 @@ func InitAdminUser() {
 			adminUser.Username = userObj.UserName
 			adminUser.Phone = userObj.Phone
 			adminUser.Email = userObj.Email
+			adminUser.Password=adminUser.GetSaltPwd("admin123")
 			uid := adminUser.Insert()
 			if uid > 0 {
 				userObj.ID = uid
 				adminUsers = append(adminUsers, uid)
+				needSaveAdminConfig=true
 			}
 			global.Admins.Users[i]=userObj
 
 		}
 	}
-	global.SaveAdminConfig()
+	if needSaveAdminConfig{
+		global.SaveAdminConfig()
+	}
 	global.SetSuperAdminUsers(adminUsers)
 }

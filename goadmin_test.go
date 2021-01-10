@@ -1,10 +1,14 @@
 package main
 
 import (
+	"encoding/json"
+	"strconv"
 	"testing"
 
 	// handle "github.com/cn-joyconn/goadmin/handle"
 	modles "github.com/cn-joyconn/goadmin/models"
+	admin "github.com/cn-joyconn/goadmin/models/admin"
+	gologs "github.com/cn-joyconn/gologs"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -26,6 +30,46 @@ func TestGoAdmin(t *testing.T) {
 
 func TestInitDB(t *testing.T) {
 	modles.InitDB()
+}
+func TestQueryUser(t *testing.T) {
+	modles.InitDB()
+	obj :=new(admin.AdminUser)
+	obj =obj.SelectByUserID(22)
+	logMsg,_:=json.Marshal(obj)
+	gologs.GetLogger("test").Info(string(logMsg))
+	obj =obj.SelectByUserName("superManage")
+	logMsg,_=json.Marshal(obj)
+	gologs.GetLogger("test").Info(string(logMsg))
+	obj =obj.SelectByPhone("18333660110")
+	logMsg,_=json.Marshal(obj)
+	gologs.GetLogger("test").Info(string(logMsg))
+	obj =obj.SelectByEmail("18333660110@189.cn")
+	logMsg,_=json.Marshal(obj)
+	gologs.GetLogger("test").Info(string(logMsg))
+	
+}
+func TestUpdateUser(t *testing.T) {
+	modles.InitDB()
+	obj :=new(admin.AdminUser)
+	obj =obj.SelectByUserID(22)
+	logMsg,_:=json.Marshal(obj)
+	gologs.GetLogger("test").Info(string(logMsg))
+
+	obj.Phone="18333660110"
+	obj.Alias="测试用户A"
+	obj.Sex=1
+	updateResult :=obj.UpdateInfo()
+	gologs.GetLogger("test").Info( strconv.FormatInt(updateResult,10))
+	
+	obj =obj.SelectByUserID(22)
+	logMsg,err:=json.Marshal(obj)
+	if err!=nil{
+		gologs.GetLogger("test").Info(err.Error())
+	}
+	gologs.GetLogger("test").Info(string(logMsg))
+
+	
+	 obj.DeleteByUserID(22)
 }
 func initFilter() {
 

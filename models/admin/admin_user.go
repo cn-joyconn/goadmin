@@ -32,8 +32,11 @@ type AdminUser struct {
 	PRoles      string    `gorm:"type:varchar(5000);column:f_roles;comment:角色列表,<角色、过期时间>数组的序列化字符串"`
 }
 
-
-
+var pwdsalt="\fjoyadmin"
+//GetSaltPwd 密码加盐
+func (adminUser *AdminUser)GetSaltPwd(password string)string{
+	return  strtool.Md5(password+pwdsalt)
+}
 //Insert 插入一条
 func (adminUser *AdminUser)Insert() int {
 	// if len(adminUser.Password)>0{
@@ -68,202 +71,198 @@ func (adminUser *AdminUser)Insert() int {
 }
 
 //UpdateInfo 修改基本信息
-func (adminUser *AdminUser)UpdateInfo() int {
+func (adminUser *AdminUser)UpdateInfo() int64 {
 	result  := defaultOrm.DB.Model(&adminUser).Select("Alias", "Sex", "HeadPortrait", "UserCD", "RealName", "Description", "Remarks").Updates( adminUser)
 	if result.Error!=nil{
 		gologs.GetLogger("orm").Error(result.Error.Error())
 		return 0
 	}
-	return int(result.RowsAffected)
+	return result.RowsAffected
 }
 
-// //UpdateState 修改一个用户的认证状态
-// //  userID 用户ID
-// //  state 状态
-// //
-// func (adminUser *AdminUser)UpdateState(userID uint32, state uint8) int64 {
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	adminUser.Status = state
-// 	id, err := defaultOrm.Orm.Update(&adminUser, "Status")
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
+//UpdateState 修改一个用户的认证状态
+//  userID 用户ID
+//  state 状态
+//
+func (adminUser *AdminUser)UpdateState(userID int, state uint8) int64 {
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	updateObj.Status = state
+	result  := defaultOrm.DB.Model(&adminUser).Select("Status").Updates(updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+}
 
-// //UpdatePassword 修改用户的认证密码
-// //  userID 用户ID
-// //  password 密码
-// //
-// func (adminUser *AdminUser)UpdatePassword(userID uint32, password string) int64 {
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	adminUser.Password = password
-// 	id, err := defaultOrm.Orm.Update(&adminUser, "Password")
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
+//UpdatePassword 修改用户的认证密码
+//  userID 用户ID
+//  password 密码
+//
+func (adminUser *AdminUser)UpdatePassword(userID int, password string) int64 {
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	updateObj.Password = password
+	result  := defaultOrm.DB.Model(&adminUser).Select("Password").Updates(updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+}
 
-// //UpdateUserName 修改用户名
-// //  userID  用户ID
-// //  username 新用户名
-// //返回修改结果
-// func (adminUser *AdminUser)UpdateUserName(userID uint32, username string) int64 {
-// 	if strtool.IsBlank(username){
-// 		return 0
-// 	}
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	adminUser.Username = username
-// 	adminUser.UsernameMd5 = strtool.Md5(username)
-// 	id, err := defaultOrm.Orm.Update(&adminUser, "UserName", "UsernameMd5")
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
+//UpdateUserName 修改用户名
+//  userID  用户ID
+//  username 新用户名
+//返回修改结果
+func (adminUser *AdminUser)UpdateUserName(userID int, username string) int64 {
+	if strtool.IsBlank(username){
+		return 0
+	}
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	updateObj.Username = username
+	updateObj.UsernameMd5 = strtool.Md5(username)
+	result  := defaultOrm.DB.Model(&adminUser).Select("Username","UsernameMd5").Updates(updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+}
 
-// //UpdateEmail 修改邮箱
-// //  userID  用户ID
-// //  email 新邮箱
-// //返回修改结果
-// func (adminUser *AdminUser)UpdateEmail(userID uint32, email string) int64 {
-// 	if strtool.IsBlank(email){
-// 		return 0
-// 	}
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	adminUser.Email = email
-// 	adminUser.EmailMD5 = strtool.Md5(email)
-// 	id, err := defaultOrm.Orm.Update(&adminUser, "Email", "EmailMD5")
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
+//UpdateEmail 修改邮箱
+//  userID  用户ID
+//  email 新邮箱
+//返回修改结果
+func (adminUser *AdminUser)UpdateEmail(userID int, email string) int64 {
+	if strtool.IsBlank(email){
+		return 0
+	}
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	updateObj.Email = email
+	updateObj.EmailMD5 = strtool.Md5(email)
+	result  := defaultOrm.DB.Model(&adminUser).Select("Email","EmailMD5").Updates(updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+}
 
-// //UpdatePhone  修改手机号
-// //  userID  用户ID
-// //  phone 新手机号
-// //返回修改结果
-// func (adminUser *AdminUser)UpdatePhone(userID uint32, phone string) int64 {
-// 	if strtool.IsBlank(phone){
-// 		return 0
-// 	}
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	adminUser.Phone = phone
-// 	adminUser.PhoneMd5 = strtool.Md5(phone)
-// 	id, err := defaultOrm.Orm.Update(&adminUser, "Phone", "PhoneMd5")
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
-// //UpdateLoginValue  修改登录账号
-// //  userID  用户ID
-// //  phone 手机号
-// //  email 邮箱
-// //  username 用户名
-// //返回修改结果
-// func (adminUser *AdminUser)UpdateLoginValue(userID uint32, phone string, email string, username string) int64 {
+//UpdatePhone  修改手机号
+//  userID  用户ID
+//  phone 新手机号
+//返回修改结果
+func (adminUser *AdminUser)UpdatePhone(userID int, phone string) int64 {
+	if strtool.IsBlank(phone){
+		return 0
+	}
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	updateObj.Phone = phone
+	updateObj.PhoneMd5 = strtool.Md5(phone)
+	result  := defaultOrm.DB.Model(&adminUser).Select("Phone","PhoneMd5").Updates(updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+}
+//UpdateLoginValue  修改登录账号
+//  userID  用户ID
+//  phone 手机号
+//  email 邮箱
+//  username 用户名
+//返回修改结果
+func (adminUser *AdminUser)UpdateLoginValue(userID int, phone string, email string, username string) int64 {
 
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	adminUser.Username = username
-// 	adminUser.Phone = phone
-// 	adminUser.Email = email
-// 	toMd5 := adminUser.Phone+adminUser.Email+adminUser.Username
-// 	if !strtool.IsBlank(adminUser.Phone) {
-// 		adminUser.PhoneMd5 = strtool.Md5(adminUser.Phone)
-// 	}else{
-// 		adminUser.PhoneMd5 = strtool.Md5(toMd5)
-// 	}
-// 	if !strtool.IsBlank(adminUser.Email) {
-// 		adminUser.EmailMD5 = strtool.Md5(adminUser.Email)
-// 	}else{
-// 		adminUser.EmailMD5 = strtool.Md5(toMd5)
-// 	}
-// 	if !strtool.IsBlank(adminUser.Username) {
-// 		adminUser.UsernameMd5 = strtool.Md5(adminUser.Username)
-// 	}else{
-// 		adminUser.UsernameMd5 = strtool.Md5(toMd5)
-// 	}
-// 	id, err := defaultOrm.Orm.Update(&adminUser, "UserName", "UsernameMd5", "Phone", "PhoneMd5", "Email", "EmailMD5")
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	updateObj.Username = username
+	updateObj.Phone = phone
+	updateObj.Email = email
+	toMd5 := adminUser.Phone+adminUser.Email+adminUser.Username
+	if !strtool.IsBlank(adminUser.Phone) {
+		updateObj.PhoneMd5 = strtool.Md5(adminUser.Phone)
+	}else{
+		updateObj.PhoneMd5 = strtool.Md5(toMd5)
+	}
+	if !strtool.IsBlank(adminUser.Email) {
+		updateObj.EmailMD5 = strtool.Md5(adminUser.Email)
+	}else{
+		updateObj.EmailMD5 = strtool.Md5(toMd5)
+	}
+	if !strtool.IsBlank(adminUser.Username) {
+		updateObj.UsernameMd5 = strtool.Md5(adminUser.Username)
+	}else{
+		updateObj.UsernameMd5 = strtool.Md5(toMd5)
+	}
+	result  := defaultOrm.DB.Model(&adminUser).Select("UserName", "UsernameMd5", "Phone", "PhoneMd5", "Email", "EmailMD5").Updates(updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+	
+}
 
-// //deleteByUserID 删除一个用户的认证信息
-// //  userID 用户ID
-// func (adminUser *AdminUser)DeleteByUserID(userID uint32) int64 {
-// 	adminUser := AdminUser{}
-// 	adminUser.ID = userID
-// 	id, err := defaultOrm.Orm.Delete(&adminUser)
+//deleteByUserID 删除一个用户的认证信息
+//  userID 用户ID
+func (adminUser *AdminUser)DeleteByUserID(userID int) int64 {
+	updateObj := &AdminUser{}
+	updateObj.ID = userID
+	result  := defaultOrm.DB.Delete(&updateObj)
+	if result.Error!=nil{
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	return result.RowsAffected
+}
 
-// 	if err == nil {
-// 		return id
-// 	} else {
-// 		return 0
-// 	}
-// }
+/**
+* 通过用户ID获取一个用户认证信息
+*  pUserID  用户ID
+*  用户认证信息 没有结果到时返回null
+ */
+func (adminUser *AdminUser)SelectByUserID(userID int)(*AdminUser) {
+	result :=new(AdminUser)
+	defaultOrm.DB.First(&result,userID)
+	return result
+}
 
-// /**
-// * 通过用户ID获取一个用户认证信息
-// *  pUserID  用户ID
-// *  用户认证信息 没有结果到时返回null
-//  */
-// func (adminUser *AdminUser)SelectByUserID(userID uint32)(adminUser *AdminUser) {
-// 	qs := defaultOrm.Orm.QueryTable(new(AdminUser))
-// 	qs.Filter("ID", userID)
-// 	qs.One(&adminUser)
-// 	return nil
-// }
+/**
+* 通过用户名获取一个用户认证信息
+*  pUsername  用户名
+*  用户认证信息 没有结果到时返回null
+ */
+func (adminUser *AdminUser)SelectByUserName(username string)( *AdminUser) {
+	result :=new(AdminUser)
+	defaultOrm.DB.Where("f_user_name_md5 = ?",strtool.Md5(username)).First(&result)
+	return result
+}
 
-// /**
-// * 通过用户名获取一个用户认证信息
-// *  pUsername  用户名
-// *  用户认证信息 没有结果到时返回null
-//  */
-// func (adminUser *AdminUser)SelectByUserName(username string)(adminUser *AdminUser) {
-// 	qs := defaultOrm.Orm.QueryTable(new(AdminUser))
-// 	qs.Filter("UserName", username)
-// 	qs.One(&adminUser)
-// 	return nil
-// }
+/**
+* 通过手机号获取一个用户认证信息
+*  pPhone  手机号
+*  用户认证信息 没有结果到时返回null
+ */
+func (adminUser *AdminUser)SelectByPhone(phone string)( *AdminUser) {
+	result :=new(AdminUser)
+	defaultOrm.DB.Where("f_phone_md5 = ?",strtool.Md5(phone)).First(&result)
+	return result
+}
 
-// /**
-// * 通过手机号获取一个用户认证信息
-// *  pPhone  手机号
-// *  用户认证信息 没有结果到时返回null
-//  */
-// func (adminUser *AdminUser)SelectByPhone(phone string)(adminUser *AdminUser) {
-// 	qs := defaultOrm.Orm.QueryTable(new(AdminUser))
-// 	qs.Filter("Phone", phone)
-// 	qs.One(&adminUser)
-// 	return nil
-// }
+/**
+* 通过email获取一个用户认证信息
+*  pEmail  email
+*  用户认证信息 没有结果到时返回null
+ */
+func (adminUser *AdminUser)SelectByEmail(email string) ( *AdminUser) {
+	result :=new(AdminUser)
+	defaultOrm.DB.Where("f_email_md5 = ?",strtool.Md5(email)).First(&result)
+	return result
 
-// /**
-// * 通过email获取一个用户认证信息
-// *  pEmail  email
-// *  用户认证信息 没有结果到时返回null
-//  */
-// func (adminUser *AdminUser)SelectByEmail(email string) (adminUser *AdminUser) {
-// 	qs := defaultOrm.Orm.QueryTable(new(AdminUser))
-// 	qs.Filter("Email", email)
-// 	qs.One(&adminUser)
-// 	return nil
-
-// }
+}
