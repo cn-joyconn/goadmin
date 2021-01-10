@@ -1,0 +1,55 @@
+
+<div class="login layui-anim layui-anim-up">
+    <div class="message">x-admin2.0-管理登录</div>
+    <div id="darkbannerwrap"></div>
+
+    <form method="post" class="layui-form" >
+        <input name="username" placeholder="用户名"  type="text" lay-verify="required|username" class="layui-input" >
+        <hr class="hr15">
+        <input name="password" lay-verify="required|password" placeholder="密码"  type="password" class="layui-input">
+        <hr class="hr15">
+        <input value="登录" lay-submit lay-filter="login" style="width:100%;" type="submit">
+        <hr class="hr20" >
+    </form>
+</div>
+
+<script>
+    $(function  () {
+        $('body').addClass('login-bg')
+        layui.use('form', function(){
+            var form = layui.form;
+
+            form.verify({
+                username: [
+                    /^\d+\d+\d$/
+                    ,'用户名不能全为数字',
+                ]
+                ,username: [
+                    /^[\S]{5,12}$/,
+                    '用户名必须5到12位，且不能出现空格'
+                ],
+                username: [
+                    /^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$/
+                    ,'用户名不能有特殊字符',
+                ]
+                ,password: [
+                    /^[\S]{5,12}$/
+                    ,'密码必须5到12位，且不能出现空格'
+                ]
+            });
+
+            //监听提交
+            form.on('submit(login)', function(data){
+                $.post("/admin/dologin",{username: data.field.username,password: data.field.password},function (data) {
+                    if(data.code != 0){
+                        layer.msg(data.msg,{icon: 5,time:1000});
+                    }else{
+                        location.href = "/admin"
+                    }
+                })
+
+                return false;
+            });
+        });
+    })
+</script>

@@ -1,0 +1,24 @@
+database:
+  db_type : "mysql" #数据库类型 mysql sqlite3 postgres
+  db_dt_prefix : "t_" #数据库表名前辍  
+  db_log : false #日志
+  db_skip_default_transaction : true #是否禁用事务（有助于提高性能）
+  db_max_idle_conns: 10 #空闲连接池中的最大连接数
+  db_max_open_conns: 30 #数据库的最大打开连接数
+  db_conn_max_life_time : 600  #连接最长存活期，超过这个时间连接将不再被复用 单位秒
+  slow_threshold : 0   #慢查询阈值 0不记录   单位秒
+  postgres:  #postgreSQL配置
+    db_name : "db_goadmin"
+    db_user : "root"
+    db_pwd : "root"
+    db_host : "127.0.0.1"
+    db_port : 5432
+  mysql: #mysql配置
+    db_host: 127.0.0.1
+    db_port: 3306
+    db_name: db_goadmin
+    db_user: root
+    db_pwd: 123456
+    db_charset: utf8mb4
+  sqlite3 : #sqlite3
+    db_name : "sqlite3.db"

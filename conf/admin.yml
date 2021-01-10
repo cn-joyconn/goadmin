@@ -1,0 +1,19 @@
+users:
+- id: 20
+  alias: 超级管理员
+  superadmin: true
+  username: superAdmin
+  phone: ""
+  email: ""
+- id: 21
+  alias: 超级管理员2
+  superadmin: true
+  username: superManage
+  phone: ""
+  email: ""
+- id: 22
+  alias: 测试用户
+  superadmin: false
+  username: user1
+  phone: ""
+  email: ""
