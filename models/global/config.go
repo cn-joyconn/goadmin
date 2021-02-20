@@ -19,6 +19,7 @@ type AppConfig struct {
 	RunMode string  `json:"runmode" yaml:"runmode"`     //运行模式 dev prod test
 	EnableGzip bool  `json:"enablegzip" yaml:"enablegzip"` //是否启用gzip
 	ContextPath string `json:"contextpath" yaml:"contextpath"` //虚拟路径
+	Cache map[string]string `json:"cache" yaml:"cache"` //缓存catalog 及 CacheName
 }
 type appConfigs struct{
 	App AppConfig `json:"app" yaml:"app"`   

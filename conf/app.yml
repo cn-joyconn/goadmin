@@ -4,3 +4,6 @@ app:
   runmode : dev        #运行模式 dev prod test
   enablegzip : false   #是否启用gzip
   contextpath : admin  #虚拟路径
+  cache :              #缓存catalog 及 CacheName ; map 类型
+    adminCatalog : joyconn
+    adminName : admin

@@ -2,14 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"testing"
+
+	// "fmt"
 
 	// handle "github.com/cn-joyconn/goadmin/handle"
 	modles "github.com/cn-joyconn/goadmin/models"
 	admin "github.com/cn-joyconn/goadmin/models/admin"
+	adminSvr "github.com/cn-joyconn/goadmin/services/admin"
+
+	// config "github.com/cn-joyconn/goadmin/utils/config"
 	gologs "github.com/cn-joyconn/gologs"
 	gin "github.com/gin-gonic/gin"
+	// filetool "github.com/cn-joyconn/goutils/filetool"
 )
 
 func TestGoAdmin(t *testing.T) {
@@ -83,3 +90,17 @@ func initFilter() {
 	// web.ErrorController(&controllers.ErrorController{})
 
 }
+
+func TestLogin(t *testing.T){
+	modles.InitDB()
+	userObj :=	adminSvr.GetAdminUser("22",1);
+	fmt.Println(userObj.Alias);
+}
+
+// func TestBaseConfiger_DefaultString(t *testing.T) {
+// 	bc := &config.YamlConfig{}
+// 	selfDir := filetool.SelfDir()
+// 	bc.Parse(selfDir + "/conf/app.yml")
+// 	fmt.Println(bc.DefaultString("app.name", "world"))
+// 	fmt.Println(bc.DefaultString("app.contextpath", "world"))
+// }

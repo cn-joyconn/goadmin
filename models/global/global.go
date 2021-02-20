@@ -23,3 +23,20 @@ const LOGIN_USER_ID = "LoginUserId"
 
 //登录用户签名
 const LOGIN_USER_ID_SIGN = "loginUserIdSign"
+
+//AdminCatalog admin缓存类别
+var AdminCatalog string
+//AdminCacheName admin缓存名称
+var AdminCacheName string
+
+func init(){
+	var ok bool
+	AdminCatalog,ok = AppConf.Cache["adminCatalog"]
+	if !ok{
+		AdminCatalog = "joyconn"
+	}
+	AdminCacheName,ok= AppConf.Cache["adminCatalog"]
+	if !ok{
+		AdminCacheName = "admin"
+	}
+}

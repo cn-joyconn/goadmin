@@ -10,9 +10,38 @@ import (
 )
 
 const (
-	ERROR   = 0
-	SUCCESS = 1
+	SUCCESS = 1      //操作成功
+	LoginSucess = 2  //登录成功
+
+	ERROR = -1 //"操作失败"
+	ParamsError = -2 //参数错误
+	ServiceError = -4 //服务器错误
+	NoResult = -3 //没有结果
+	NoRule = -5 //没有权限
+	CehckCodeError = -6 //验证码错误
+	VerifyFail = -7 //参数签名验证失败
+	DbError = -8  //数据访问错误
+	FiledRepeat = -9 //字段重复
+
+
+	NoLogin = -101   //用户未登录	
+	TokenNotExist = -102 //令牌不存在
+	TokenFail = -103 //令牌错误
+	UserLocck = -104 //用户锁定
+	LoginIdError = -105 //登录id错误
+	LoginPassError = -106  //密码错误
+	LoginFail = -107 //登录失败
+	UserNameExisit = -108 //用户名已存在
+	EmailExisit = -109 //邮箱已存在
+	PhoneExisit = -110 //手机号已存在
+
+	CreditNotEnough = -201 //余额不足
+	GoodsInvalid = -202 //商品已失效
+	PayError = -203 //支付失败
+
 )
+
+	
 
 //响应参数结构体
 type Response struct {

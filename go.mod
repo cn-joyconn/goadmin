@@ -1,10 +1,11 @@
 module github.com/cn-joyconn/goadmin
 
-go 1.15
+go 1.16
 
 require (
-	github.com/cn-joyconn/gologs v0.0.0-20210107134835-136a0221f89c
-	github.com/cn-joyconn/goutils v0.0.0-20210107134125-4839077d0228
+	github.com/cn-joyconn/gocache v0.0.0-20210219144648-2ef7dcc5db1c
+	github.com/cn-joyconn/gologs v0.0.0-20210219144827-af2b79d36fe7
+	github.com/cn-joyconn/goutils v0.0.0-20210220150053-a9d8b2128b46 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	go.uber.org/zap v1.16.0
 	gopkg.in/yaml.v2 v2.4.0
