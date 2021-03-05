@@ -15,11 +15,15 @@ var adminConfigPath string
 //AppConfig 应用配置
 type AppConfig struct {
 	Name string `json:"name" yaml:"name"`   // 应用名称
-	WebPort uint   `json:"webport" yaml:"webport"`    //web服务监听端口
+	WebPort int   `json:"webport" yaml:"webport"`    //web服务监听端口
 	RunMode string  `json:"runmode" yaml:"runmode"`     //运行模式 dev prod test
 	EnableGzip bool  `json:"enablegzip" yaml:"enablegzip"` //是否启用gzip
 	ContextPath string `json:"contextpath" yaml:"contextpath"` //虚拟路径
-	Cache map[string]string `json:"cache" yaml:"cache"` //缓存catalog 及 CacheName
+	JSPath string `json:"jspath" yaml:"jspath"` //js访问路径
+	CSSPath string `json:"csspath" yaml:"csspath"` //css访问路径
+	ImagePath string `json:"iamgepath" yaml:"iamgepath"` //image访问路径
+	FilePath string `json:"filepath" yaml:"filepath"` //file访问路径
+	Cache map[string]string `json:"cache" yaml:"cache"` //缓存catalog 及 CacheName	
 }
 type appConfigs struct{
 	App AppConfig `json:"app" yaml:"app"`   
@@ -63,22 +67,15 @@ type DefUsers struct{
 	Users []DefUser `json:"users" yaml:"users"`   
 }
 
-func init(){
-	selfDir := filetool.SelfDir()
-	appConfigPath = selfDir + "/conf/app.yml"
-	dbConfigPath = selfDir + "/conf/db.yml"
-	adminConfigPath = selfDir + "/conf/admin.yml"
-	initAppConf(appConfigPath)
-	initDBConf(dbConfigPath)
-	loadAdmin(adminConfigPath)
-}
-func  initAppConf(configPath string)  {
+
+func  InitAppConf(configPath string)  {	
 	if filetool.IsExist(configPath) {
 		configBytes, err := filetool.ReadFileToBytes(configPath)
 		if err != nil {
-			gologs.GetLogger("").Error(err.Error())
+			gologs.GetLogger("").Error("读取"+configPath+"文件错误。"+err.Error())
 			return
 		}
+		gologs.GetLogger("").Info("成功读取"+configPath+"文件")
 		var appconfigs appConfigs
 		err = yaml.Unmarshal(configBytes, &appconfigs)
 		if err != nil {
@@ -86,19 +83,22 @@ func  initAppConf(configPath string)  {
 			gologs.GetLogger("").Error("解析"+configPath+"文件失败")
 			return
 		}
+		gologs.GetLogger("").Info("成功解析"+configPath+"文件")
+		appConfigPath = configPath
 		AppConf = &appconfigs.App
 	} else {
 		gologs.GetLogger("").Error("未找到"+configPath)
 		return
 	}
 }
-func  initDBConf(configPath string)  {
+func  InitDBConf(configPath string)  {
 	if filetool.IsExist(configPath) {
-		configBytes, err := filetool.ReadFileToBytes(configPath)
+		configBytes, err := filetool.ReadFileToBytes(configPath)	
 		if err != nil {
-			gologs.GetLogger("").Error(err.Error())
+			gologs.GetLogger("").Error("读取"+configPath+"文件错误。"+err.Error())
 			return
 		}
+		gologs.GetLogger("").Info("成功读取"+configPath+"文件")
 		var dbconfs dbConfigs
 		err = yaml.Unmarshal(configBytes, &dbconfs)
 		if err != nil {
@@ -116,6 +116,8 @@ func  initDBConf(configPath string)  {
 			gologs.GetLogger("").Error("解析"+configPath+"文件失败")
 			return
 		}
+		gologs.GetLogger("").Info("成功解析"+configPath+"文件")
+		dbConfigPath = configPath
 		DBConf = &dbconfs.Database
 	} else {
 		gologs.GetLogger("").Error("未找到"+configPath)
@@ -123,25 +125,27 @@ func  initDBConf(configPath string)  {
 	}
 }
 
-func  loadAdmin(configPath string)  {
+func  LoadAdmin(configPath string)  {
 	if filetool.IsExist(configPath) {
 		configBytes, err := filetool.ReadFileToBytes(configPath)
 		if err != nil {
-			gologs.GetLogger("").Error(err.Error())
+			gologs.GetLogger("").Error("读取"+configPath+"文件错误。"+err.Error())
 			return
-		}
-		
+		}		
+		gologs.GetLogger("").Info("成功读取"+configPath+"文件")
 		err = yaml.Unmarshal(configBytes, &Admins)
 		if err != nil {
 			gologs.GetLogger("").Error("解析"+configPath+"文件失败")
 			return
 		}
+		gologs.GetLogger("").Info("成功解析"+configPath+"文件")
 		users :=make([]int,0)
 		for _,val := range Admins.Users{
 			if val.SuperAdmin&& val.ID>0 {
 				users = append(users, val.ID)
 			}
 		}
+		adminConfigPath = configPath
 		SetSuperAdminUsers(users)
 	} else {
 		gologs.GetLogger("").Error("未找到"+configPath)

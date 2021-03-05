@@ -1,0 +1,800 @@
+::-moz-focus-inner {
+  border-color: transparent;
+}
+
+.JoyDialog {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10001;
+  width: 100%;
+  height: 100%;
+  font-size: .75rem;
+}
+
+.JoyDialog .dialog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10002;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.JoyDialog .dialog-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10003;
+  width: 90%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+  line-height: 1.5;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: .5rem;
+}
+.JoyDialog .dialog-content * {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  -moz-user-select: text;
+  -webkit-tap-highlight-color: transparent;
+  font-family: Helvetica;
+  font-size: 1rem;
+}
+
+.JoyDialog .dialog-btn, .dialog-btn-hl {
+  position: relative;
+  display: inline-block;
+  height: 2.8rem;
+  line-height: 2rem;
+  color: #007aff;
+  font-size: 1.3rem;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: none;
+  background-color: transparent;
+}
+.JoyDialog .dialog-btn:hover, .dialog-btn:active, .dialog-btn-hl:hover, .dialog-btn-hl:active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.JoyDialog .dialog-content-hd {
+  position: relative;
+  padding: 1.4rem 1.4rem .8rem;
+  margin-bottom:  -1.5rem;;
+  text-align: center;
+}
+.JoyDialog .dialog-content-hd .dialog-content-title {
+  font-size: 1.13rem;
+  font-weight: bold;
+  color: #333;
+}
+.JoyDialog .dialog-content-hd .dialog-btn-close {
+  display: block;
+  width: 1.625rem;
+  height:  1.625rem;
+  overflow: hidden;
+  position: absolute;
+  top: 1.125rem;
+  right: .938rem;
+  cursor: pointer;
+  background-color: transparent;
+}
+.JoyDialog .dialog-content-hd .dialog-btn-close span {
+  display: none;
+}
+.JoyDialog .dialog-content-hd .dialog-btn-close:before, .dialog-content-hd .dialog-btn-close:after {
+  content: "";
+  display: block;
+  width: 1.125rem;
+  height: .0625rem;
+  background-color: #333;
+  position: absolute;
+  top: .8125rem;
+  right: .175rem;
+}
+.JoyDialog .dialog-content-hd .dialog-btn-close:before {
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+}
+.JoyDialog .dialog-content-hd .dialog-btn-close:after {
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+      transform: rotate(-45deg);
+}
+
+.JoyDialog .dialog-content-bd {
+  margin: 1.563rem 1.25rem;
+  color: #000;
+  text-align: center;
+}
+.JoyDialog .dialog-content-bd p {
+  padding: .31rem 0;
+}
+
+.JoyDialog .content-scroll {
+  overflow-y: auto;
+  /* -webkit-overflow-scrolling: touch; */
+}
+
+.JoyDialog .dialog-content-ft {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  font-size: 0;
+}
+.JoyDialog .dialog-content-ft:after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: .0625rem;
+  border-top: .0625rem solid #d5d5d5;
+  color: #d5d5d5;
+  -webkit-transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+      transform-origin: 0 0;
+  -webkit-transform: scaleY(0.5);
+  -ms-transform: scaleY(0.5);
+      transform: scaleY(0.5);
+}
+.JoyDialog .dialog-content-ft .dialog-btn {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  display: block;
+}
+.JoyDialog .dialog-content-ft .dialog-btn:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: .0625rem;
+  height: 100%;
+  border-left: .0625rem solid #d5d5d5;
+  color: #d5d5d5;
+  -webkit-transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+      transform-origin: 0 0;
+  -webkit-transform: scaleX(0.5);
+  -ms-transform: scaleX(0.5);
+      transform: scaleX(0.5);
+}
+.JoyDialog .dialog-content-ft .dialog-btn:first-child {
+  border-bottom-left-radius: .5rem;
+}
+.JoyDialog .dialog-content-ft .dialog-btn:first-child:after {
+  border-left: none;
+}
+.JoyDialog .dialog-content-ft .dialog-btn:last-child {
+  border-bottom-right-radius: .5rem;
+}
+
+.JoyDialog .dialog-content-ft.stacked {
+  -webkit-flex-flow: column;
+      -ms-flex-flow: column;
+          flex-flow: column;
+  display: block;
+}
+.JoyDialog .dialog-content-ft.stacked:after {
+  border: none;
+}
+.JoyDialog .dialog-content-ft.stacked .dialog-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.JoyDialog .dialog-content-ft.stacked .dialog-btn:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: .0625rem;
+  border-top: .0625rem solid #d5d5d5;
+  color: #d5d5d5;
+  -webkit-transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+      transform-origin: 0 0;
+  -webkit-transform: scaleY(0.5);
+  -ms-transform: scaleY(0.5);
+      transform: scaleY(0.5);
+}
+
+.JoyDialog.dialog-open .dialog-content,
+.JoyDialog.dialog-open .dialog-overlay,
+.JoyDialog.dialog-close .dialog-content,
+.JoyDialog.dialog-close .dialog-overlay {
+  -webkit-animation-duration: 0.25s;
+  animation-duration: 0.25s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.JoyDialog.dialog-open .dialog-content {
+  -webkit-animation-name: zoom-in;
+  animation-name: zoom-in;
+}
+.JoyDialog.dialog-open .dialog-overlay {
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
+}
+
+.JoyDialog.dialog-close .dialog-content {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+.JoyDialog.dialog-close .dialog-overlay {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+
+/**-------------------------
+ *  pc style
+ **------------------------*/
+[data-style=pc].JoyDialog .dialog-content {
+  box-sizing: content-box;
+  border-radius: 0;
+  background-color: white;
+}
+[data-style=pc].JoyDialog .dialog-content-hd {
+  text-align: left;
+  padding: .625rem 1.25rem ;
+  margin-bottom: -.625rem;
+  border-bottom: .0625rem solid #E5E5E5;
+}
+[data-style=pc].JoyDialog .dialog-content-hd .dialog-btn-close {
+  top: .625rem;
+  right: .938rem;
+}
+[data-style=pc].JoyDialog .dialog-content-bd {
+  margin: 1.563rem 1.25rem;
+  text-align: left;
+}
+[data-style=pc].JoyDialog .dialog-content-ft {
+  display: block;
+  padding: .5rem;
+  margin-top: -.625rem;
+  text-align: right;
+}
+[data-style=pc].JoyDialog .dialog-content-ft:after {
+  border: none;
+}
+[data-style=pc].JoyDialog .dialog-content-ft .dialog-btn {
+  display: inline-block;
+  min-width: 3.75rem;
+  height: 2.25rem;
+  line-height: 2.25rem;
+  overflow: hidden;
+  padding: 0 .8125rem;
+  font-size: 1rem;
+  color: #333;
+  text-align: center;
+  border-radius: .125rem;
+  margin:.125rem;
+  border:  .0625rem solid #E5E5E5; 
+  border-radius:'10%';
+}
+[data-style=pc].JoyDialog .dialog-content-ft .dialog-btn:after {
+  border: none;
+}
+[data-style=pc].JoyDialog .dialog-content-ft .dialog-btn-confirm,
+[data-style=pc].JoyDialog .dialog-content-ft .dialog-btn-hl {
+  color: #00bbd3;
+}
+[data-style=pc].JoyDialog .dialog-content-ft.stacked .dialog-btn {
+  display: block;
+  text-align: right;
+  width: 100%;
+}
+[data-style=pc].JoyDialog .dialog-content-ft-border:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: .0625rem;
+  border-top: .0625rem solid #d5d5d5;
+  color: #d5d5d5;
+  -webkit-transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+      transform-origin: 0 0;
+  -webkit-transform: scaleY(0.5);
+  -ms-transform: scaleY(0.5);
+      transform: scaleY(0.5);
+}
+[data-style=pc].JoyDialog .ripple {
+  border-radius: 99999px;
+  pointer-events: none;
+  position: absolute;
+  width: 12.5rem;
+  height: 12.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  -webkit-transform: scale(0);
+  -ms-transform: scale(0);
+      transform: scale(0);
+  animation: ripple .75s ease-out;
+  -webkit-animation: ripple .75s ease-out;
+}
+@-webkit-keyframes ripple {
+  0% {
+    -webkit-transform: scale(0);
+    opacity: .5;
+  }
+  100% {
+    -webkit-transform: scale(2);
+    opacity: 0;
+  }
+}
+@keyframes ripple {
+  0% {
+    -webkit-transform: scale(0);
+            transform: scale(0);
+    opacity: .5;
+  }
+  100% {
+    -webkit-transform: scale(2);
+            transform: scale(2);
+    opacity: 0;
+  }
+}
+[data-style=pc].JoyDialog .dialog-open .dialog-content {
+  -webkit-animation-name: bounce-in-down;
+  animation-name: bounce-in-down;
+}
+[data-style=pc].JoyDialog .dialog-open .dialog-overlay {
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
+}
+
+[data-style=pc].JoyDialog .dialog-close .dialog-content {
+  -webkit-animation-name: bounce-out-up;
+  animation-name: bounce-out-up;
+}
+[data-style=pc].dialog-close .dialog-overlay {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+
+/* toast */
+.JoyDialog.dialog-toast .dialog-overlay {
+  background-color: transparent;
+}
+.JoyDialog.dialog-toast .dialog-content {
+  width: 9.25rem;
+  height: 9.25rem;
+  border-radius: .625rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: table;
+}
+.JoyDialog.dialog-toast .dialog-content-bd {
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+.JoyDialog.dialog-toast .dialog-content-bd p {
+  margin: 0;
+  padding: 0;
+}
+.JoyDialog.dialog-toast .info-icon {
+  width: 3.5rem;
+  max-width: 3.5rem;
+  font-size: 2.5rem;
+}
+.JoyDialog.dialog-toast .info-text {
+  display: block;
+  width: 90%;
+  margin: .6rem auto 0;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.JoyDialog.dialog-toast.dialog-open .dialog-content,
+.JoyDialog.dialog-toast.dialog-open .dialog-overlay {
+  -webkit-animation-duration: 0.5s;
+  animation-duration: 0.5s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.JoyDialog.dialog-toast.dialog-close .dialog-content,
+.JoyDialog.dialog-toast.dialog-close .dialog-overlay {
+  -webkit-animation-duration: 0.35s;
+  animation-duration: 0.35s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.JoyDialog.dialog-toast.dialog-open .dialog-content {
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
+}
+.JoyDialog.dialog-toast.dialog-open .dialog-overlay {
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
+}
+
+.JoyDialog.dialog-toast.dialog-close .dialog-content {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+.JoyDialog.dialog-toast.dialog-close .dialog-overlay {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+
+/* notice */
+.JoyDialog.dialog-notice .dialog-overlay {
+  background-color: transparent;
+}
+.JoyDialog.dialog-notice .dialog-content {
+  display: table;
+  width: auto;
+  max-width: 85%;
+  border-radius: .25rem;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.JoyDialog.dialog-notice .dialog-content-bd {
+  margin: 0;
+  font-size: 0;
+  padding: .625rem .938rem;
+  line-height: normal;
+}
+.JoyDialog.dialog-notice .info-icon {
+  width: 1rem;
+  max-width: 1rem;
+  margin: 0 .125rem;
+  vertical-align: middle;
+  position: relative;
+  top: -.0625rem;
+}
+.JoyDialog.dialog-notice .info-text {
+  margin: 0 .125rem;
+  font-size: .875rem;
+  color: #fff;
+  line-height: 1.3;
+  vertical-align: middle;
+}
+
+.JoyDialog.dialog-notice.dialog-open .dialog-content,
+.JoyDialog.dialog-notice.dialog-open .dialog-overlay {
+  -webkit-animation-duration: 0.1s;
+  animation-duration: 0.1s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.JoyDialog.dialog-notice.dialog-close .dialog-content,
+.JoyDialog.dialog-notice.dialog-close .dialog-overlay {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.JoyDialog.dialog-notice.dialog-open .dialog-content {
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
+}
+.dialog-notice.dialog-open .dialog-overlay {
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
+}
+
+.JoyDialog.dialog-notice.dialog-close .dialog-content {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+.JoyDialog.dialog-notice.dialog-close .dialog-overlay {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+.JoyDialog.dialog-notice-top .dialog-content {
+  margin-top: 1.5rem;
+  -webkit-transform: translate(-50%, -1.25rem);
+  -ms-transform: translate(-50%, -1.25rem);
+      transform: translate(-50%, -1.25rem);
+}
+
+.JoyDialog.dialog-notice-bottom .dialog-content {
+  top: auto;
+  bottom: 0;
+  -webkit-transform: translate(-50%, -1.25rem);
+  -ms-transform: translate(-50%, -1.25rem);
+      transform: translate(-50%, -1.25rem);
+}
+.JoyDialog.dialog-notice-top.dialog-open .dialog-content,
+.JoyDialog.dialog-notice-top.dialog-open .dialog-overlay,
+.JoyDialog.dialog-notice-top.dialog-close .dialog-content,
+.JoyDialog.dialog-notice-top.dialog-close .dialog-overlay,
+.JoyDialog.dialog-notice-bottom.dialog-open .dialog-content,
+.JoyDialog.dialog-notice-bottom.dialog-open .dialog-overlay,
+.JoyDialog.dialog-notice-bottom.dialog-close .dialog-content,
+.JoyDialog.dialog-notice-bottom.dialog-close .dialog-overlay {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.JoyDialog.dialog-notice-top.dialog-open .dialog-content,
+.JoyDialog.dialog-notice-bottom.dialog-open .dialog-content {
+  -webkit-animation-name: bounce-in-up;
+  animation-name: bounce-in-up;
+}
+
+.JoyDialog.dialog-notice-top.dialog-close .dialog-content,
+.JoyDialog.dialog-notice-bottom.dialog-close .dialog-content {
+  -webkit-animation-name: fade-out;
+  animation-name: fade-out;
+}
+
+/**-------------------------
+ *  meida query
+ **------------------------*/
+@media screen and (min-width: 1023px) {
+  .JoyDialog .dialog-content {
+    width: 60%;
+  }
+}
+@media screen and (min-width: 767px) {
+  .JoyDialog .dialog-content {
+    width: 60%;
+  }
+}
+/**-------------------------
+ *  animate library
+ **------------------------*/
+@-webkit-keyframes zoom-in {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -50%) scale(1.2, 1.2);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -50%) scale(1, 1);
+  }
+}
+@keyframes zoom-in {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -50%) scale(1.2, 1.2);
+    transform: translate(-50%, -50%) scale(1.2, 1.2);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -50%) scale(1, 1);
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+}
+@-webkit-keyframes zoom-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -50%) scale(0.8, 0.8);
+  }
+}
+@keyframes zoom-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -50%) scale(0.8, 0.8);
+    transform: translate(-50%, -50%) scale(0.8, 0.8);
+  }
+}
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes bounce-in-down {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -75%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -50%);
+  }
+}
+@keyframes bounce-in-down {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -75%);
+    transform: translate(-50%, -75%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+}
+@-webkit-keyframes bounce-out-up {
+  0% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -50%);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -75%);
+  }
+}
+@keyframes bounce-out-up {
+  0% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, -75%);
+    transform: translate(-50%, -75%);
+  }
+}
+@-webkit-keyframes bounce-in-up {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, 0);
+  }
+  80% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -1.5rem);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -1.25rem);
+  }
+}
+@keyframes bounce-in-up {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+  }
+  80% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -1.5rem);
+    transform: translate(-50%, -1.5rem);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -1.25rem);
+    transform: translate(-50%, -1.25rem);
+  }
+}
+@-webkit-keyframes bounce-out-down {
+  0% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -1.25rem);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, 0);
+  }
+}
+@keyframes bounce-out-down {
+  0% {
+    opacity: 1;
+    -webkit-transform: translate(-50%, -1.25rem);
+    transform: translate(-50%, -1.25rem);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+  }
+}
+.JoyDialog-loading-route-animation {
+
+  animation: JoyDialog-rotate-animation 2s linear infinite;
+
+}
+@keyframes JoyDialog-rotate-animation{
+  0%{transform:rotate(0deg);-webkit-transform:rotate(0deg);} 
+  25%{transform:rotate(90deg);-webkit-transform:rotate(90deg);}
+  50%{transform:rotate(180deg);-webkit-transform:rotate(180deg);}
+  75%{transform:rotate(270deg);-webkit-transform:rotate(270deg);}
+  100%{transform:rotate(360deg);-webkit-transform:rotate(360deg);} 
+}
+@-webkit-keyframes JoyDialog-rotate-animation{
+  0%{-webkit-transform:rotate(0deg);} 
+  25%{-webkit-transform:rotate(90deg);}
+  50%{-webkit-transform:rotate(180deg);}
+  75%{-webkit-transform:rotate(270deg);}
+  100%{-webkit-transform:rotate(360deg);} 
+}@font-face {font-family: "JDialog-icon";
+  src: url(./iconfont/iconfont.eot); /* IE9 */
+  src: url(./iconfont/iconfont.eot#iefix) format('embedded-opentype'), 
+  url('data:application/x-font-woff2;charset=utf-8;base64,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') format('woff2'),
+  url(./iconfont/iconfont.woff) format('woff'),
+  url(./iconfont/iconfont.ttf) format('truetype'), 
+  url(./iconfont/iconfont.svg#JDialog-icon) format('svg'); /* iOS 4.1- */
+}
+
+.JDialog-icon {
+  font-family: "JDialog-icon" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-loading:before {
+  content: "\e688";
+}
+
+.icon-question:before {
+  content: "\e61f";
+}
+
+.icon-windcontrol:before {
+  content: "\e634";
+}
+
+.icon-info:before {
+  content: "\e65b";
+}
+
+.icon-busy_toast:before {
+  content: "\e632";
+}
+
+.icon-alert_toast:before {
+  content: "\e633";
+}
+
+.icon-failure_toast:before {
+  content: "\e636";
+}
+
+.icon-success_toast:before {
+  content: "\e63a";
+}
+

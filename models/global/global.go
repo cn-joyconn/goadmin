@@ -9,34 +9,17 @@ const URL_RELOAD = "url://reload"
 //返回上一个页面
 const URL_BACK = "url://back"
 
-//关闭当前layer弹窗
-const URL_CLOSE_LAYER = "url://close-layer"
 
-//关闭当前弹窗并刷新父级
-const URL_CLOSE_REFRESH = "url://close-refresh"
 
-//登录用户key
-const LOGIN_USER = "loginUser"
-
-//登录用户id
-const LOGIN_USER_ID = "LoginUserId"
-
-//登录用户签名
-const LOGIN_USER_ID_SIGN = "loginUserIdSign"
+//上下文中存储用户信息的键
+const Context_UserInfo = "Context_UserInfo"
+//上下文中存储用户ID的键
+const Context_UserId = "Context_UserId"
 
 //AdminCatalog admin缓存类别
 var AdminCatalog string
+
 //AdminCacheName admin缓存名称
 var AdminCacheName string
 
-func init(){
-	var ok bool
-	AdminCatalog,ok = AppConf.Cache["adminCatalog"]
-	if !ok{
-		AdminCatalog = "joyconn"
-	}
-	AdminCacheName,ok= AppConf.Cache["adminCatalog"]
-	if !ok{
-		AdminCacheName = "admin"
-	}
-}
+

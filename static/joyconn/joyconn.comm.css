@@ -1,0 +1,111 @@
+/**joyconn-collapse**/
+.joyconn-collapse {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-weight: 400;
+}
+.joyconn-collapse:hover {
+  overflow: visible;
+}
+
+
+
+
+.joyconn-collapse > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #b6c3c9;
+  line-height: 30px;
+  /* height: 30px; */
+}
+.joyconn-collapse > li:last-child {
+    border-bottom: 1px solid #b6c3c9;;
+}
+.joyconn-collapse > li > span {
+  padding: 12px 5px 12px 15px;
+  display: block;
+  border-left: 3px solid transparent;
+}
+.joyconn-collapse > li > span > .fa{
+  width: 20px;
+}
+.joyconn-collapse > li .label,
+.joyconn-collapse > li .badge {
+  margin-top: 3px;
+  margin-right: 5px;
+}
+
+.joyconn-collapse > li:hover > span {
+  color: #b6c3c9;
+  border-left-color: #3c8dbc;
+}
+.joyconn-collapse li  .icheckbox_flat,
+.joyconn-collapse li  .icheckbox_flat-red,
+.joyconn-collapse li  .icheckbox_square,
+.joyconn-collapse li  .icheckbox_square-blue {
+  float: left;margin-top: 15px;
+  z-index: 1;
+}
+.joyconn-collapse li  .view_item_name {
+  width: 100%;margin-left: 30px;cursor: pointer;
+}
+.joyconn-collapse li > span {
+  position: relative;
+}
+.joyconn-collapse li > span > .pull-right {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  margin-top: -7px;
+}
+.joyconn-collapse li   .fa-angle-left,.joyconn-collapse li   .fa-angle-down {
+  float: right;
+  line-height: 30px;
+  font-size: 20px;
+  color: #8aa4af;
+  margin-right: 10px;
+}
+
+
+
+/* .joyconn-collapse >li.active   .fa-angle-left {
+  -webkit-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+} */
+
+
+.joyconn-collapse li.active > .treeview-collapse {
+  display: block;
+}
+
+
+.joyconn-collapse .treeview-collapse {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  /* padding-left: 5px; */
+}
+.joyconn-collapse .treeview-collapse  li {
+  margin: 0;
+  border-top: 1px solid #b6c3c9;
+  line-height: 30px;
+}
+.joyconn-collapse .treeview-collapse > li > span {
+  display: block;
+  font-size: 14px;
+  padding:  10px 0px 10px 15px;;
+}
+.joyconn-collapse .treeview-collapse > li > span > .fa{
+  width: 20px;
+}
+
+.joyconn-collapse .treeview-collapse > li >  span:hover {
+  color: #b6c3c9;
+  /* border-left-color: #3c8dbc; */
+}
+/**joyconn-collapse**/

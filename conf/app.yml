@@ -3,7 +3,11 @@ app:
   webport : 8888       #web服务监听端口
   runmode : dev        #运行模式 dev prod test
   enablegzip : false   #是否启用gzip
-  contextpath : admin  #虚拟路径
+  contextpath : /admin  #虚拟路径
+  csspath : /admin      #css访问相对路径
+  jspath : /admin       #js访问相对路径
+  imagepath : /admin    #image访问相对路径
+  filepath : /admin     #file访问相对路径
   cache :              #缓存catalog 及 CacheName ; map 类型
     adminCatalog : joyconn
     adminName : admin

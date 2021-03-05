@@ -9,9 +9,9 @@ import (
 	// "fmt"
 
 	// handle "github.com/cn-joyconn/goadmin/handle"
-	modles "github.com/cn-joyconn/goadmin/models"
-	admin "github.com/cn-joyconn/goadmin/models/admin"
-	adminSvr "github.com/cn-joyconn/goadmin/services/admin"
+	initialize "github.com/cn-joyconn/goadmin/initialize"
+	// adminModel "github.com/cn-joyconn/goadmin/models/admin"
+	adminService "github.com/cn-joyconn/goadmin/services/admin"
 
 	// config "github.com/cn-joyconn/goadmin/utils/config"
 	gologs "github.com/cn-joyconn/gologs"
@@ -36,47 +36,52 @@ func TestGoAdmin(t *testing.T) {
 }
 
 func TestInitDB(t *testing.T) {
-	modles.InitDB()
+	initialize.Init(func(e *gin.Engine) bool {
+		return true
+	})
 }
 func TestQueryUser(t *testing.T) {
-	modles.InitDB()
-	obj :=new(admin.AdminUser)
-	obj =obj.SelectByUserID(22)
-	logMsg,_:=json.Marshal(obj)
+	initialize.Init(func(e *gin.Engine) bool {
+		return true
+	})
+	service := new(adminService.AdminUserService)
+	obj := service.GetUserByUserID("22")
+	logMsg, _ := json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
-	obj =obj.SelectByUserName("superManage")
-	logMsg,_=json.Marshal(obj)
+	obj = service.GetUserByUserName("superManage")
+	logMsg, _ = json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
-	obj =obj.SelectByPhone("18333660110")
-	logMsg,_=json.Marshal(obj)
+	obj = service.GetUserByPhone("18333660110")
+	logMsg, _ = json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
-	obj =obj.SelectByEmail("18333660110@189.cn")
-	logMsg,_=json.Marshal(obj)
-	gologs.GetLogger("test").Info(string(logMsg))
-	
-}
-func TestUpdateUser(t *testing.T) {
-	modles.InitDB()
-	obj :=new(admin.AdminUser)
-	obj =obj.SelectByUserID(22)
-	logMsg,_:=json.Marshal(obj)
+	obj = service.GetUserByEmail("18333660110@189.cn")
+	logMsg, _ = json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
 
-	obj.Phone="18333660110"
-	obj.Alias="测试用户A"
-	obj.Sex=1
-	updateResult :=obj.UpdateInfo()
-	gologs.GetLogger("test").Info( strconv.FormatInt(updateResult,10))
-	
-	obj =obj.SelectByUserID(22)
-	logMsg,err:=json.Marshal(obj)
-	if err!=nil{
+}
+func TestUpdateUser(t *testing.T) {
+	initialize.Init(func(e *gin.Engine) bool {
+		return true
+	})
+	service := new(adminService.AdminUserService)
+	obj := service.GetUserByUserID("22")
+	logMsg, _ := json.Marshal(obj)
+	gologs.GetLogger("test").Info(string(logMsg))
+
+	obj.Phone = "18333660110"
+	obj.Alias = "测试用户A"
+	obj.Sex = 1
+	updateResult := service.UpdateUserPubInfo(22, "测试用户A", 1, "", "")
+	gologs.GetLogger("test").Info(strconv.Itoa(updateResult))
+
+	obj = service.GetUserByUserID("22")
+	logMsg, err := json.Marshal(obj)
+	if err != nil {
 		gologs.GetLogger("test").Info(err.Error())
 	}
 	gologs.GetLogger("test").Info(string(logMsg))
 
-	
-	 obj.DeleteByUserID(22)
+	service.DeleteUser(22)
 }
 func initFilter() {
 
@@ -91,10 +96,13 @@ func initFilter() {
 
 }
 
-func TestLogin(t *testing.T){
-	modles.InitDB()
-	userObj :=	adminSvr.GetAdminUser("22",1);
-	fmt.Println(userObj.Alias);
+func TestLogin(t *testing.T) {
+	initialize.Init(func(e *gin.Engine) bool {
+		return true
+	})
+	service := new(adminService.AdminUserService)
+	userObj := service.GetAdminUser("22", 1)
+	fmt.Println(userObj.Alias)
 }
 
 // func TestBaseConfiger_DefaultString(t *testing.T) {
@@ -104,3 +112,10 @@ func TestLogin(t *testing.T){
 // 	fmt.Println(bc.DefaultString("app.name", "world"))
 // 	fmt.Println(bc.DefaultString("app.contextpath", "world"))
 // }
+
+func TestWeb(t *testing.T) {
+	initialize.Init(func(e *gin.Engine) bool {
+		return true
+	})
+
+}
