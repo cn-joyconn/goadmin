@@ -1,0 +1,167 @@
+{{define "account/login.html"}} 
+
+<!DOCTYPE html>
+<html>
+<head>    
+  {{template "layout/head.html" .}}
+</head>
+<body>
+  <div class="login-box">
+    <div class="card card-outline card-primary">
+      <div class="card-header text-center">
+        <a href="../../index2.html" class="h1">{{.pageTitle}} - {{.pageTitleSuffix}}</a>
+      </div>
+      <div class="card-body">  
+        <div  id="formcontent">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="username" value="{{.username}}" placeholder="用户名/手机号" />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <input type="password" class="form-control" id="password" placeholder="Password">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3 CaptchaContainer" style="display: none;">
+            <input type="input" class="form-control" id="valcode" placeholder="验证码" value="" style="width:160px;display: inline;" />
+            <span>
+              <img src=""  id="valcodeimg" onclick="loginPage_operat.showCaptcha()"/><font  class="text-yellow"  id="valcodenote" onclick="loginPage_operat.showCaptcha()">看不清？</font>
+            </span>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <div class="icheck-primary">
+                <input type="checkbox" id="remember" />
+                <label for="remember">
+                  记住我
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <button type="submit" id="loginBTN" class="btn btn-primary btn-block">登录</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- <div class="social-auth-links text-center mt-2 mb-3">
+          <a href="#" class="btn btn-block btn-primary">
+            <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+          </a>
+          <a href="#" class="btn btn-block btn-danger">
+            <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+          </a>
+        </div> -->
+        <!-- /.social-auth-links -->
+  
+        <!-- <p class="mb-1">
+          <a href="forgot-password.html">I forgot my password</a>
+        </p>
+        <p class="mb-0">
+          <a href="register.html" class="text-center">Register a new membership</a>
+        </p> -->
+      </div>
+    </div>
+</div>
+    
+
+    {{template "layout/foot.html" .}}
+    
+    <link href="{{.staticResourcesPathJs}}/static/plugins/iCheck/square/blue.css" type="text/css" rel="stylesheet"/>
+    <script src="{{.staticResourcesPathJs}}/static/plugins/iCheck/icheck.min.js"></script>
+    <script>
+      var loginPage_operat={
+        data:{
+          CaptchaID:"0",
+          captchaShow : '{{.joyconnVerifyCodeloginCodeenable}}'
+        }
+      }
+      loginPage_operat.showCaptcha=function(){
+        if(!loginPage_operat.data.captchaShow){
+          return
+        }
+        $.get(
+          page_content_path + '/common/authimage',
+            {
+              height: 40,
+              Width:80,
+            },
+            function (data) {
+                if (data.code == 1) {
+                  loginPage_operat.data.CaptchaID=data.msg
+                  $('#valcodeimg').attr("src",data.data)
+                } 
+            }
+        );
+      }
+       $(function () {
+            $('body').addClass("login-page");
+            if(loginPage_operat.data.captchaShow){
+              $('.CaptchaContainer').show()
+              loginPage_operat.showCaptcha()
+              $('')
+            }
+            $('input[type="checkbox"]').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+            function validateInput(sender) {
+                var val = $(sender).val();
+                if (val.toString().trim() == "" || val.toString().trim().length < 4) {
+                    if ($(sender).attr("id") == "username") {
+                        JoyDialog({content: '请输入正确的用户名或手机号'});
+                    } else if ($(sender).attr("id") == "password") {
+                        JoyDialog({content: '请输入的密码'});
+                    } else if ($(sender).attr("id") == "valcode" ) {
+                        if(loginPage_operat.data.captchaShow){
+                          loginPage_operat.showCaptcha();
+                          JoyDialog({content: '请输入的正确的验证码'});
+                        }
+                      
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            $("#loginBTN").click(function () {
+                if (validateInput($("#username")) && validateInput($("#password"))&& validateInput($("#valcode"))) {
+                    $.post(
+                        'dologin',
+                        {
+                            phone: $("#username").val(),
+                            pwd: $("#password").val(),
+                            valcode: $("#valcode").val(),
+                            remember: $("#rememberme").is(':checked'),
+                            CaptchaID: loginPage_operat.data.CaptchaID
+                        },
+                        function (data) {
+                            if (data.code == -6) {
+                              JoyDialog({content: '请输入的正确的验证码'});
+                            } else if (data.code == -1) {
+                              JoyDialog({content: '服务器忙碌'});
+                            } else if (data.code == 2) {
+                                window.location.href = page_content_path+"/page/joyconn/authorize/Permission/resource";
+                                return;
+                            } else {
+                                JoyDialog({content: '手机号或密码错误'});
+                            }
+                            loginPage_operat.showCaptcha();
+                        }
+                    );
+                }
+            });
+        });
+
+  </script>
+</body>
+</html>
+{{end}}
+

@@ -30,13 +30,13 @@ func InitServer() *gin.Engine {
 	gologs.GetLogger("").Info("register swagger handler")
 
 	//Error
-	// Router.NoMethod(middleware.HandleNotFound)
-	// Router.NoRoute(middleware.HandleNotFound)
-	// Router.Use(middleware.ErrHandler())
-	// gologs.GetLogger("").Info("use middleware ErrorHandle")
+	Router.NoMethod(middleware.HandleNotFound)
+	Router.NoRoute(middleware.HandleNotFound)
+	Router.Use(middleware.ErrHandler())
+	gologs.GetLogger("").Info("use middleware ErrorHandle")
 
 	//view template
-	Router.LoadHTMLGlob("views/**/*")
+	Router.LoadHTMLGlob("templates/**/*")
 
 	return Router
 

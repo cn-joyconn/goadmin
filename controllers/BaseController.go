@@ -22,22 +22,25 @@ func (bc *BaseController) ResponseHtml(c *gin.Context, name string, data gin.H) 
 	data["staticResourcesPathCss"] = global.AppConf.CSSPath
 	data["staticResourcesPathFile"] = global.AppConf.FilePath
 	data["staticResourcesPathImage"] = global.AppConf.ImagePath
+	data["pageContentPath"] = global.AppConf.ContextPath
+	data["pageTitleSuffix"] = global.AppConf.Name
 	userObj, exit := c.Get(global.Context_UserInfo)
 	if exit {
 		data["userInfo"] = userObj
 	}
+
 	c.HTML(http.StatusOK, name, data)
 }
 
 //JSON输出
-func (bc *BaseController) ApiJson(c *gin.Context,code int16, msg string, data interface{}) {
+func (bc *BaseController) ApiJson(c *gin.Context, code int, msg string, data interface{}) {
 	if data == nil {
 		data = ""
 	}
 	// c.ServeJSON()
 	// c.StopRun()
 	c.JSON(http.StatusOK, &global.Response{
-		Code: int(code),
+		Code: code,
 		Msg:  msg,
 		Data: data,
 		Url:  "",
@@ -46,18 +49,18 @@ func (bc *BaseController) ApiJson(c *gin.Context,code int16, msg string, data in
 }
 
 //返回成功的API成功
-func (bc *BaseController) ApiSuccess(c *gin.Context,msg string, data interface{}) {
-	bc.ApiJson(c,0, msg, data)
+func (bc *BaseController) ApiSuccess(c *gin.Context, msg string, data interface{}) {
+	bc.ApiJson(c, global.SUCCESS, msg, data)
 }
 
 //返回失败的API请求
-func (bc *BaseController) ApiError(c *gin.Context,msg string, data interface{}) {
-	bc.ApiJson(c,-1, msg, data)
+func (bc *BaseController) ApiError(c *gin.Context, msg string, data interface{}) {
+	bc.ApiJson(c, global.ERROR, msg, data)
 }
 
 //返回失败且带code的API请求
-func (bc *BaseController) ApiErrorCode(c *gin.Context,msg string, data interface{}, code int16) {
-	bc.ApiJson(c,code, msg, data)
+func (bc *BaseController) ApiErrorCode(c *gin.Context, msg string, data interface{}, code int) {
+	bc.ApiJson(c, code, msg, data)
 }
 
 // //请求出错

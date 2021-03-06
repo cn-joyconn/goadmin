@@ -9,5 +9,22 @@ app:
   imagepath : /admin    #image访问相对路径
   filepath : /admin     #file访问相对路径
   cache :              #缓存catalog 及 CacheName ; map 类型
-    adminCatalog : joyconn
-    adminName : admin
+    adminCatalog : joyconn    #damin模块 缓存类别
+    adminName : admin         #admin模块 缓存名称
+    authName : authentication #认证模块 缓存名称
+  authorize :          #登录认证相关  
+    loginUrl : /page/account/login #登录页面的url
+    loginRefParam : ref #跳转登录页面的携带源url的参数名
+    multilogin : true #是否允许一个账号多人同时登录  是true 否false
+    verifyCode: #登录页验证码
+      enable : true #登录时是否启用验证码
+      method : 1 #认证方式 1:数字,2:字母,3:算术,4:数字字母混合.
+    cookie : 
+      loginName : goadmin_loginName #cookie中记录用户名的cookie键
+      domain : 0.0.0.0 #令牌作用的域名，设置为abc.com对a.abc.com、b.abc.com均有效，设置a.abc.com对b.abc.com无效。cookie的作用域参加w3c，如果设置0.0.0.0则代表默认域名
+      loginToken : goadmin_loginToken #认证令牌在cookie中的名称
+      loginTokenAesKey : I?vek2w\ 
+
+
+
+    

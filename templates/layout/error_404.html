@@ -1,0 +1,54 @@
+
+{{define "layout/error_404.html"}} 
+
+<!DOCTYPE html>
+<html>
+<head>    
+  {{template "layout/head.html" .}}
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- Content Wrapper. Contains page content -->
+    <div  style="min-height: 2010.04px;">
+    
+  
+      <!-- Main content -->
+      <section class="content" style="padding-top: 100px;">
+        <div class="error-page">
+          <h2 class="headline text-warning"> 404</h2>
+  
+          <div class="error-content">
+            <h3><i class="fas fa-exclamation-triangle text-warning"></i> 很抱歉， 页面它不小心迷路了~</h3>
+  
+            <p  style="padding-left: 40px;">
+              It looks like you're lost...
+            </p>
+            <p style="padding-left: 40px;">
+                <a class="btn  btn-outline-primary" href="{{.contextPath}}/">返回首页</a> or <a class="btn  btn-outline-primary" href="javascript:history.go(-1)">返回上一页</a>
+            </p>
+            
+          </div>
+          <!-- /.error-content -->
+        </div>
+        <!-- /.error-page -->
+      </section>
+      <!-- /.content -->
+    </div>
+
+
+</div>
+    
+
+    {{template "layout/foot.html" .}}
+
+    <script>
+      $(function  () {
+          $('body').addClass("sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed accent-navy text-sm");       
+      })
+  </script>
+</body>
+</html>
+{{end}}
+
+

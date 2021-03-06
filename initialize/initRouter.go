@@ -23,6 +23,7 @@ func RegistorRouters(Router *gin.Engine) {
 	PermissioneGroup := contextRouter.Group("")
 	AuthGroup.Use(middleware.Authorize())
 	PermissioneGroup.Use(middleware.Permission())
+	routers.InitCommonRouter(PublicGroup, AuthGroup, PermissioneGroup)
 	routers.InitAccountRouter(PublicGroup, AuthGroup, PermissioneGroup)
 
 	// {

@@ -4,6 +4,10 @@ import (
 	//"net/http"
 
 	// global "github.com/cn-joyconn/goadmin/models/global"
+	"time"
+
+	"github.com/cn-joyconn/goadmin/models/global"
+	"github.com/cn-joyconn/goadmin/utils/joyCaptcha"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +19,19 @@ type AccountController struct {
 // @Tags LoginPage
 // @Summary 用户登录
 func (controller *AccountController) LoginPage(c *gin.Context) {
-	controller.ResponseHtml(c, "account/login2.html", gin.H{})
+	data := gin.H{
+		"pageTitle": "登录",
+	}
+	username, err := c.Cookie(global.AppConf.Authorize.Cookie.LoginName)
+	if err == nil {
+		data["username"] = ""
+	} else {
+		data["username"] = username
+	}
+	data["joyconnVerifyCodeloginCodeenable"] = global.AppConf.Authorize.VerifyCode.Enable
+	data["ranPath"] = time.Now().Unix()
+
+	controller.ResponseHtml(c, "account/login.html", data)
 }
 
 //LoginApi 登录接口
@@ -25,6 +41,18 @@ func (controller *AccountController) LoginPage(c *gin.Context) {
 // @Param data body request.Login true "用户名, 密码, 验证码"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
 func (controller *AccountController) LoginApi(c *gin.Context) {
+	//比对验证码
+	if global.AppConf.Authorize.VerifyCode.Enable {
+		captchaID := c.PostForm("CaptchaID")
+		valcode := c.PostForm("valcode")
+		verifyResult := joyCaptcha.CaptchaVerify(captchaID, valcode)
+
+		if !verifyResult {
+			controller.ApiErrorCode(c, "验证码不正确", "", global.CehckCodeError)
+			return
+		}
+	}
+
 	// var L request.Login
 	// _ = c.ShouldBindJSON(&L)
 	// if err := utils.Verify(L, utils.LoginVerify); err != nil {

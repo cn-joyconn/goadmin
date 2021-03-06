@@ -9,7 +9,15 @@ import (
 	// middleware "github.com/cn-joyconn/goadmin/middleware"
 	"github.com/gin-gonic/gin"
 )
+//通用
+func InitCommonRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, permissioneGroup *gin.RouterGroup) {
+	controller := &controllers.CommonController{}
+	commonRouter := publicGroup.Group("common")
+	{
+		commonRouter.GET("authimage", controller.AuthImage)
+	}
 
+}
 //登录
 func InitAccountRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, permissioneGroup *gin.RouterGroup) {
 	controller := &controllers.AccountController{}
