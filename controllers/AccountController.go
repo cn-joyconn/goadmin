@@ -8,6 +8,7 @@ import (
 
 	"github.com/cn-joyconn/goadmin/models/global"
 	"github.com/cn-joyconn/goadmin/utils/joyCaptcha"
+	"github.com/cn-joyconn/goutils/strtool"
 	"github.com/gin-gonic/gin"
 )
 
@@ -47,10 +48,12 @@ func (controller *AccountController) LoginApi(c *gin.Context) {
 		valcode := c.PostForm("valcode")
 		verifyResult := joyCaptcha.CaptchaVerify(captchaID, valcode)
 
-		if !verifyResult {
+		if !verifyResult || strtool.IsBlank(captchaID) || strtool.IsBlank(valcode) {
 			controller.ApiErrorCode(c, "验证码不正确", "", global.CehckCodeError)
 			return
 		}
+	} else {
+		controller.ApiErrorCode(c, "验证码不正确1", "", global.CehckCodeError)
 	}
 
 	// var L request.Login

@@ -75,11 +75,11 @@ type DefUsers struct {
 
 //登录认证相关配置
 type AuthorizeCfg struct {
-	LoginUrl      string              //登录页面的url
-	LoginRefParam string              //跳转登录页面的携带源url的参数名
-	Multilogin    bool                //是否允许一个账号多人同时登录  是true 否false
-	VerifyCode    LoginPageVerifyCode //登录页验证码
-	Cookie        AuthorizeCookie
+	LoginUrl      string              `json:"loginUrl" yaml:"loginUrl"`           //登录页面的url
+	LoginRefParam string              `json:"loginRefParam" yaml:"loginRefParam"` //跳转登录页面的携带源url的参数名
+	Multilogin    bool                `json:"multilogin" yaml:"multilogin"`       //是否允许一个账号多人同时登录  是true 否false
+	VerifyCode    LoginPageVerifyCode `json:"verifyCode" yaml:"verifyCode"`       //登录页验证码
+	Cookie        AuthorizeCookie     `json:"cookie" yaml:"cookie"`
 }
 
 //登录页验证码

@@ -9,6 +9,7 @@ import (
 	// middleware "github.com/cn-joyconn/goadmin/middleware"
 	"github.com/gin-gonic/gin"
 )
+
 //通用
 func InitCommonRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, permissioneGroup *gin.RouterGroup) {
 	controller := &controllers.CommonController{}
@@ -18,6 +19,7 @@ func InitCommonRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, 
 	}
 
 }
+
 //登录
 func InitAccountRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, permissioneGroup *gin.RouterGroup) {
 	controller := &controllers.AccountController{}
@@ -26,14 +28,14 @@ func InitAccountRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup,
 		accountRouter.GET("login", controller.LoginPage)
 		accountRouter.POST("dologin", controller.LoginApi)
 	}
-	myInfoRouter := authGroup.Group("myinfo")
-	{
-		myInfoRouter.GET("getme", controller.LoginPage)
-	}
-	userRouter := publicGroup.Group("user")
-	{
-		userRouter.GET("list", controller.LoginPage)
-		userRouter.POST("update", controller.LoginApi) 
-	}
+	// myInfoRouter := authGroup.Group("myinfo")
+	// {
+	// 	myInfoRouter.GET("getme", controller.LoginPage)
+	// }
+	// userRouter := publicGroup.Group("user")
+	// {
+	// 	userRouter.GET("list", controller.LoginPage)
+	// 	userRouter.POST("update", controller.LoginApi)
+	// }
 
 }
