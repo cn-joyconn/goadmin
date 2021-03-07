@@ -14,7 +14,7 @@
       <div class="card-body">  
         <div  id="formcontent">
           <div class="input-group mb-3">
-            <input type="text" class="form-control" id="username" value="{{.username}}" placeholder="用户名/手机号" />
+            <input type="text" class="form-control" id="username" value="" placeholder="用户名/手机号" />
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -107,6 +107,10 @@
               loginPage_operat.showCaptcha()
               $('')
             }
+            var loginName = $.cookie('goadmin_loginName');
+            if(loginName){
+              $("#username").val(loginName)
+            }
             $('input[type="checkbox"]').iCheck({
                 checkboxClass: 'icheckbox_square-blue',
                 radioClass: 'iradio_square-blue',
@@ -136,10 +140,9 @@
                     $.post(
                         'dologin',
                         {
-                            phone: $("#username").val(),
+                          loginID: $("#username").val(),
                             pwd: $("#password").val(),
                             valcode: $("#valcode").val(),
-                            remember: $("#rememberme").is(':checked'),
                             CaptchaID: loginPage_operat.data.CaptchaID
                         },
                         function (data) {
@@ -147,7 +150,8 @@
                               JoyDialog({content: '请输入的正确的验证码'});
                             } else if (data.code == -1) {
                               JoyDialog({content: '服务器忙碌'});
-                            } else if (data.code == 2) {
+                            } else if (data.code == 2) {       
+                               $.cookie('goadmin_loginName',$("#username").val());                       
                                 window.location.href = page_content_path+"/page/joyconn/authorize/Permission/resource";
                                 return;
                             } else {

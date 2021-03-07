@@ -16,17 +16,18 @@ var adminConfigPath string
 
 //AppConfig 应用配置
 type AppConfig struct {
-	Name        string            `json:"name" yaml:"name"`               // 应用名称
-	WebPort     int               `json:"webport" yaml:"webport"`         //web服务监听端口
-	RunMode     string            `json:"runmode" yaml:"runmode"`         //运行模式 dev prod test
-	EnableGzip  bool              `json:"enablegzip" yaml:"enablegzip"`   //是否启用gzip
-	ContextPath string            `json:"contextpath" yaml:"contextpath"` //虚拟路径
-	JSPath      string            `json:"jspath" yaml:"jspath"`           //js访问路径
-	CSSPath     string            `json:"csspath" yaml:"csspath"`         //css访问路径
-	ImagePath   string            `json:"imagepath" yaml:"imagepath"`     //image访问路径
-	FilePath    string            `json:"filepath" yaml:"filepath"`       //file访问路径
-	Cache       map[string]string `json:"cache" yaml:"cache"`             //缓存catalog 及 CacheName
-	Authorize   AuthorizeCfg      `json:"authorize" yaml:"authorize"`     //登录认证相关配置
+	Name            string            `json:"name" yaml:"name"`                       // 应用名称
+	WebPort         int               `json:"webport" yaml:"webport"`                 //web服务监听端口
+	RunMode         string            `json:"runmode" yaml:"runmode"`                 //运行模式 dev prod test
+	EnableGzip      bool              `json:"enablegzip" yaml:"enablegzip"`           //是否启用gzip
+	ContextPath     string            `json:"contextpath" yaml:"contextpath"`         //虚拟路径
+	JSPath          string            `json:"jspath" yaml:"jspath"`                   //js访问路径
+	CSSPath         string            `json:"csspath" yaml:"csspath"`                 //css访问路径
+	ImagePath       string            `json:"imagepath" yaml:"imagepath"`             //image访问路径
+	FilePath        string            `json:"filepath" yaml:"filepath"`               //file访问路径
+	Cache           map[string]string `json:"cache" yaml:"cache"`                     //缓存catalog 及 CacheName
+	Authorize       AuthorizeCfg      `json:"authorize" yaml:"authorize"`             //登录认证相关配置
+	SnowflakeWorkID int64             `json:"snowflakeWorkID" yaml:"snowflakeWorkID"` //全局唯一ID工作节点（雪花算法节点）
 }
 type appConfigs struct {
 	App AppConfig `json:"app" yaml:"app"`
@@ -90,7 +91,6 @@ type LoginPageVerifyCode struct {
 
 //登录认证cookie
 type AuthorizeCookie struct {
-	LoginName        string `json:"loginName" yaml:"loginName"`               //cookie中记录用户名的cookie键
 	Domain           string `json:"domain" yaml:"domain"`                     //令牌作用的域名，设置为abc.com对a.abc.com、b.abc.com均有效，设置a.abc.com对b.abc.com无效。cookie的作用域参加w3c，如果设置0.0.0.0则代表默认域名
 	LoginToken       string `json:"loginToken" yaml:"loginToken"`             //认证令牌在cookie中的名称
 	LoginTokenAesKey string `json:"loginTokenAesKey" yaml:"loginTokenAesKey"` //认证令牌aes加密key

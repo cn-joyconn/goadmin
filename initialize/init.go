@@ -15,6 +15,7 @@ func Init(f ExtInit) {
 	InitConfig()
 	InitDB(true)
 	joyCaptcha.InitCaptcha()
+	
 	Router := InitServer()
 	RegistorRouters(Router)
 	if f(Router) {

@@ -3,6 +3,7 @@ app:
   webport : 8888       #web服务监听端口
   runmode : dev        #运行模式 dev prod test
   enablegzip : false   #是否启用gzip
+  snowflakeWorkID : 1   #全局唯一ID工作节点（雪花算法节点）
   contextpath : /admin  #虚拟路径
   csspath : /admin      #css访问相对路径
   jspath : /admin       #js访问相对路径
@@ -20,7 +21,6 @@ app:
       enable : true #登录时是否启用验证码
       method : 1 #认证方式 1:数字,2:字母,3:算术,4:数字字母混合.
     cookie : 
-      loginName : goadmin_loginName #cookie中记录用户名的cookie键
       domain : 0.0.0.0 #令牌作用的域名，设置为abc.com对a.abc.com、b.abc.com均有效，设置a.abc.com对b.abc.com无效。cookie的作用域参加w3c，如果设置0.0.0.0则代表默认域名
       loginToken : goadmin_loginToken #认证令牌在cookie中的名称
       loginTokenAesKey : I?vek2w\ 

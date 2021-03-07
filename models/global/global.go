@@ -1,5 +1,7 @@
 package global
 
+import "github.com/cn-joyconn/goutils/snowflake"
+
 //不做任何操作
 const URL_CURRENT = "url://current"
 
@@ -22,4 +24,4 @@ var AdminCatalog string
 //AdminCacheName admin缓存名称
 var AdminCacheName string
 
-
+var SnowflakeWorker *snowflake.Worker

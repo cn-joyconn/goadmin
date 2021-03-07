@@ -2,6 +2,7 @@ package joyCaptcha
 
 import (
 	"image/color"
+	"strings"
 
 	"github.com/cn-joyconn/goadmin/models/global"
 	gocache "github.com/cn-joyconn/gocache"
@@ -55,7 +56,7 @@ func (store *JoyCaptchaStore) Verify(id, answer string, clear bool) bool {
 	if clear {
 		store.StoreCacheObj.Delete(store.getCacheKey(id))
 	}
-	return value == answer
+	return strings.ToLower(value) == strings.ToLower(answer)
 }
 func InitCaptcha() {
 	store.StoreCacheObj = &gocache.Cache{

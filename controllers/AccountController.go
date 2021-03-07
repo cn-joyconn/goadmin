@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/cn-joyconn/goadmin/models/global"
+	adminServices "github.com/cn-joyconn/goadmin/services/admin"
+	adminModel "github.com/cn-joyconn/goadmin/models/admin"
 	"github.com/cn-joyconn/goadmin/utils/joyCaptcha"
 	"github.com/cn-joyconn/goutils/strtool"
 	"github.com/gin-gonic/gin"
@@ -23,12 +25,12 @@ func (controller *AccountController) LoginPage(c *gin.Context) {
 	data := gin.H{
 		"pageTitle": "登录",
 	}
-	username, err := c.Cookie(global.AppConf.Authorize.Cookie.LoginName)
-	if err == nil {
-		data["username"] = ""
-	} else {
-		data["username"] = username
-	}
+	// username, err := c.Cookie(global.AppConf.Authorize.Cookie.LoginName)
+	// if err == nil {
+	// 	data["username"] = ""
+	// } else {
+	// 	data["username"] = username
+	// }
 	data["joyconnVerifyCodeloginCodeenable"] = global.AppConf.Authorize.VerifyCode.Enable
 	data["ranPath"] = time.Now().Unix()
 
@@ -52,25 +54,38 @@ func (controller *AccountController) LoginApi(c *gin.Context) {
 			controller.ApiErrorCode(c, "验证码不正确", "", global.CehckCodeError)
 			return
 		}
-	} else {
-		controller.ApiErrorCode(c, "验证码不正确1", "", global.CehckCodeError)
 	}
-
-	// var L request.Login
-	// _ = c.ShouldBindJSON(&L)
-	// if err := utils.Verify(L, utils.LoginVerify); err != nil {
-	// 	response.FailWithMessage(err.Error(), c)
-	// 	return
-	// }
-	// if store.Verify(L.CaptchaId, L.Captcha, true) {
-	// 	U := &model.SysUser{Username: L.Username, Password: L.Password}
-	// 	if err, user := service.Login(U); err != nil {
-	// 		global.GVA_LOG.Error("登陆失败! 用户名不存在或者密码错误", zap.Any("err", err))
-	// 		response.FailWithMessage("用户名不存在或者密码错误", c)
-	// 	} else {
-	// 		tokenNext(c, *user)
-	// 	}
-	// } else {
-	// 	response.FailWithMessage("验证码错误", c)
-	// }
+	loginID := c.PostForm("phone")
+	pwd := c.PostForm("pwd")
+	remember := c.PostForm("remember")
+	adminUserService:=&adminServices.AdminUserService{}
+	var adminUserModel *adminModel.AdminUser
+	var code int
+	if adminUserService.IsPhone(loginID){
+		adminUserModel,code = adminUserService.LoginByPhone(loginID,pwd)
+	}else if adminUserService.IsEmail(loginID){
+		adminUserModel,code = adminUserService.LoginByEmail(loginID,pwd)
+	}else if adminUserService.IsUserName(loginID){
+		adminUserModel,code = adminUserService.LoginByUserName(loginID,pwd)
+	}else{
+		controller.ApiErrorCode(c, "用户不存在或密码不正确", "", global.LoginFail)
+		return
+	}
+	if code==global.LoginSucess {
+		ObjectMapper mapper=new ObjectMapper();
+		result.setCode(loginResult.getCode());
+		result.setResult(mapper.readValue(mapper.writeValueAsString(loginResult.getResult()), JoyConnAuthorizeAuthenticationResultModel.class));
+		String token=  tokenHelper.setAuthenticationToken(String.valueOf( loginResult.getResult().getPUserID()),loginResult.getResult().getPPassword(),"/",reponse,false);
+		result.getResult().setLoginToken(token);
+		result.getResult().setHeaderTokenKey(tokenHelper.getLoginTokenName());
+		if(rememberMe) {
+            CookieUtils.addCookie(reponse, joyconnloginName, loginName, 0, "", "");
+        }else {
+            CookieUtils.delCookie(request,reponse, joyconnloginName);
+        }
+	}else{
+		controller.ApiErrorCode(c, "用户不存在或密码不正确", "", global.LoginFail)
+		return
+	}
+	
 }
