@@ -2,10 +2,8 @@ package loginToken
 
 import (
 	"encoding/json"
-	"strconv"
 	"time"
 
-	"github.com/cn-joyconn/goadmin/models/global"
 	"github.com/cn-joyconn/goutils/encrypt"
 	"github.com/cn-joyconn/goutils/strtool"
 )
@@ -47,13 +45,13 @@ func ParseLoginTokenID(tokenStr string, token_ekey string) *LoginTokenID {
 * @param password 密码
 * Created by Eric.Zhang on 2016/12/29.
  */
-func CreateLoginTokenID(userid string, password string, token_ekey string) *LoginTokenID {
-	sign := global.SnowflakeWorker.GetId()	
+func CreateLoginTokenID(sign string,userid string, password string, token_ekey string) *LoginTokenID {
+	
 	loginTokenID := &LoginTokenID{
 		Uid:       userid,
 		Pwd:       password,
 		Timestamp: time.Now().Unix(),
-		Sign:      strconv.FormatInt(sign, 16),
+		Sign:      sign,
 		AesKey:    token_ekey,
 	}
 	return loginTokenID

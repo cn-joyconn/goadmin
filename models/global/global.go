@@ -1,6 +1,9 @@
 package global
 
-import "github.com/cn-joyconn/goutils/snowflake"
+import (
+	loginToken "github.com/cn-joyconn/goadmin/utils/loginToken"
+	snowflake "github.com/cn-joyconn/goutils/snowflake"
+)
 
 //不做任何操作
 const URL_CURRENT = "url://current"
@@ -25,3 +28,5 @@ var AdminCatalog string
 var AdminCacheName string
 
 var SnowflakeWorker *snowflake.Worker
+
+var TokenHelper *loginToken.TokenHelper 

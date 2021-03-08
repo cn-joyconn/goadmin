@@ -3,7 +3,6 @@ package initialize
 import (
 	global "github.com/cn-joyconn/goadmin/models/global"
 	filetool "github.com/cn-joyconn/goutils/filetool"
-	"github.com/cn-joyconn/goutils/snowflake"
 )
 
 // InitConfig 加载配置
@@ -17,20 +16,7 @@ func InitConfig() {
 	adminConfigPath := selfDir + "/conf/admin.yml"
 	global.InitAppConf(appConfigPath)
 	global.InitDBConf(dbConfigPath)
-	global.LoadAdmin(adminConfigPath)
-	initCacheCfg()
-	snowflakeWorker, _ := snowflake.NewWorker(global.AppConf.SnowflakeWorkID)
-	global.SnowflakeWorker = snowflakeWorker
+	global.LoadAdmin(adminConfigPath)	
 }
 
-func initCacheCfg() {
-	var ok bool
-	global.AdminCatalog, ok = global.AppConf.Cache["adminCatalog"]
-	if !ok {
-		global.AdminCatalog = "joyconn"
-	}
-	global.AdminCacheName, ok = global.AppConf.Cache["adminCacheName"]
-	if !ok {
-		global.AdminCacheName = "admin"
-	}
-}
+

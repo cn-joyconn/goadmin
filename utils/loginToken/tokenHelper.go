@@ -1,34 +1,50 @@
 package loginToken
 
 import (
-	global "github.com/cn-joyconn/goadmin/models/global"
 	gocache "github.com/cn-joyconn/gocache"
 	log "github.com/cn-joyconn/gologs"
 	"github.com/cn-joyconn/goutils/strtool"
 	"github.com/gin-gonic/gin"
+	// "strconv"
 )
 
-var tokenHelperCacheObj *gocache.Cache
+type TokenUUid interface {
+	CreatID() string
+}
 
 type TokenHelper struct {
+	CacheObj       *gocache.Cache
+	LoginTokenName string //loginToken在cookie或header种存储的名称
+	LoginTokenKey  string //loginToken加密key(aes加密)
+	Multilogin     bool   //是否运行一个账号同时登录多次
+	CookieDomain   string //存储在cookie中的domain
+
+	SUCCESS       int //成功状态码
+	LoginSucess   int //登陆成功状态码
+	TokenFail     int //token认证失败状态码
+	TokenNotExist int //token不存在状态码
+
+	MkUUid TokenUUid //
+
 }
 
-func init() {
-	tokenHelperCacheObj = &gocache.Cache{
-		Catalog:   global.AdminCatalog,
-		CacheName: global.AdminCacheName,
-	}
-}
+// func Crea(cacheCatlog string,cacheName string,tokenConfig *TokenConfig) {
+// 	tokenHelperCacheObj = &gocache.Cache{
+// 		Catalog:   cacheCatlog,
+// 		CacheName: cacheName,
+// 	}
+// 	tokenHelperConfig = tokenConfig
+// }
 
 func (th *TokenHelper) getCacheKey(uid string) string {
 	return "cas_token_" + uid
 }
 func (th *TokenHelper) getLoginTokenCookieName() string {
-	val := global.AppConf.Authorize.Cookie.LoginToken // config.String("joyconn.loginToken.cookie")
+	val := th.LoginTokenName // config.String("joyconn.loginToken.cookie")
 	return val
 }
 func (th *TokenHelper) getLoginTokenKey() string {
-	val := global.AppConf.Authorize.Cookie.LoginTokenAesKey // config.String("joyconn.loginToken.Key")
+	val := th.LoginTokenKey // config.String("joyconn.loginToken.Key")
 	return val
 }
 
@@ -37,7 +53,7 @@ func (th *TokenHelper) getLoginTokenKey() string {
 * @param uid
  */
 func (th *TokenHelper) ClearAuthenticationToken(uid string) {
-	tokenHelperCacheObj.Delete(th.getCacheKey(uid))
+	th.CacheObj.Delete(th.getCacheKey(uid))
 }
 
 /**
@@ -48,30 +64,30 @@ func (th *TokenHelper) ClearAuthenticationToken(uid string) {
  */
 func (th *TokenHelper) ValidationSign(uid string, sign string) int {
 	loginUidCacacheKeyheKey := th.getCacheKey(uid)
-	if global.AppConf.Authorize.Multilogin {
+	if th.Multilogin {
 		loginUidCacacheKeyheKey = loginUidCacacheKeyheKey + "_" + sign
 		var cachaObj int
-		err := tokenHelperCacheObj.Get(loginUidCacacheKeyheKey, &cachaObj)
+		err := th.CacheObj.Get(loginUidCacacheKeyheKey, &cachaObj)
 		if err != nil {
-			return global.TokenNotExist
+			return th.TokenNotExist
 		} else {
-			if cachaObj == global.LoginSucess {
-				return global.SUCCESS
+			if cachaObj == th.LoginSucess {
+				return th.SUCCESS
 			} else {
-				return global.TokenFail
+				return th.TokenFail
 			}
 		}
 	} else {
 		//用户的登录唯一标示写入全局缓存，用作一个用户只能登录一次
 		var cachaObj string
-		err := tokenHelperCacheObj.Get(loginUidCacacheKeyheKey, &cachaObj)
+		err := th.CacheObj.Get(loginUidCacacheKeyheKey, &cachaObj)
 		if err != nil {
-			return global.TokenNotExist
+			return th.TokenNotExist
 		} else {
 			if cachaObj == sign {
-				return global.SUCCESS
+				return th.SUCCESS
 			} else {
-				return global.TokenFail
+				return th.TokenFail
 			}
 		}
 	}
@@ -97,29 +113,29 @@ func (th *TokenHelper) SetAuthenticationToken(uid string, pwd string, c *gin.Con
  */
 func (th *TokenHelper) SetAuthenticationToken2(uid string, pwd string, path string, c *gin.Context, byCookie bool) string {
 	token := ""
-	ltID := CreateLoginTokenID(uid, pwd, th.getLoginTokenKey())
+	sign := th.MkUUid.CreatID()
+	ltID := CreateLoginTokenID(sign, uid, pwd, th.getLoginTokenKey())
 	if ltID != nil {
 		token = ltID.toString()
 		if strtool.IsBlank(token) {
 			log.GetLogger("").Error(uid + "生成令牌失败2！")
 		} else {
-			sign := ltID.Sign
-			if global.AppConf.Authorize.Multilogin {
+			if th.Multilogin {
 				cacheKey := th.getCacheKey(uid) + "_" + sign
-				tokenHelperCacheObj.Put(cacheKey, global.LoginSucess, 1000*60*60*24)
+				th.CacheObj.Put(cacheKey, th.LoginSucess, 1000*60*60*24)
 			} else {
 				//用户的登录唯一标示写入全局缓存，用作一个用户只能登录一次
-				tokenHelperCacheObj.Put(th.getCacheKey(uid), sign, 1000*60*60*24)
+				th.CacheObj.Put(th.getCacheKey(uid), sign, 1000*60*60*24)
 			}
 			if byCookie {
-				cookieDomain := global.AppConf.Authorize.Cookie.Domain
+				cookieDomain := th.CookieDomain
 				if "0.0.0.0" == cookieDomain {
 					cookieDomain = ""
 				}
 				c.SetCookie(th.getLoginTokenCookieName(), token, 0, path, cookieDomain, false, false)
 			} else {
-				c.Request.Header.Set("Access-Control-Expose-Headers", global.AppConf.Authorize.Cookie.LoginToken)
-				c.Request.Header.Set(global.AppConf.Authorize.Cookie.LoginToken, token)
+				c.Request.Header.Set("Access-Control-Expose-Headers", th.LoginTokenName)
+				c.Request.Header.Set(th.LoginTokenName, token)
 			}
 
 		}
@@ -136,13 +152,13 @@ func (th *TokenHelper) SetAuthenticationToken2(uid string, pwd string, path stri
 * @return
  */
 func (th *TokenHelper) GetMyAuthToken(c *gin.Context) *LoginTokenID {
-	return th.GetMyAuthToken2(c, global.AppConf.Authorize.Cookie.LoginTokenAesKey)
+	return th.GetMyAuthToken2(c, th.LoginTokenKey)
 }
 func (th *TokenHelper) GetMyAuthToken2(c *gin.Context, tokenKey string) *LoginTokenID {
 
-	token := c.Request.Header.Get(global.AppConf.Authorize.Cookie.LoginToken)
+	token := c.Request.Header.Get(th.LoginTokenName)
 	if strtool.IsBlank(token) {
-		cookie, err := c.Cookie(global.AppConf.Authorize.Cookie.LoginToken)
+		cookie, err := c.Cookie(th.LoginTokenName)
 		if err != nil {
 			token = ""
 		} else {
