@@ -1,14 +1,16 @@
 package admin
+
 import (
 	// "encoding/json"
 	// "crypto/md5"
 	"strconv"
 
-	defaultOrm "github.com/cn-joyconn/goadmin/models/defaultOrm"
-	gologs "github.com/cn-joyconn/gologs"
 	adminModel "github.com/cn-joyconn/goadmin/models/admin"
+	defaultOrm "github.com/cn-joyconn/goadmin/models/defaultOrm"
 	global "github.com/cn-joyconn/goadmin/models/global"
 	gocache "github.com/cn-joyconn/gocache"
+	gologs "github.com/cn-joyconn/gologs"
+	joyarray "github.com/cn-joyconn/goutils/array"
 	strtool "github.com/cn-joyconn/goutils/strtool"
 )
 var roleCacheObj *gocache.Cache
@@ -83,6 +85,67 @@ func (service *AdminRoleService)SelectByPrimaryKey(pId int)*adminModel.AdminRole
 	return result
 
 }
+
+/**
+*查询角色
+* @param pId 角色id
+* @return  未找到时返回null
+*/
+ func (service *AdminRoleService) SelectByRoleIds(pIds []int) []*adminModel.AdminRole {
+	if pIds == nil {
+		return nil
+	}
+	cacheKeyList := make([]string, 0)
+	notExisitPids := make([]int, 0)
+	var err error
+
+	result := make([]*adminModel.AdminRole, 0)
+	pIds = joyarray.RemoveDuplicateInt(pIds)
+	if pIds != nil {
+		for _, pid := range pIds {
+			cacheKeyList = append(cacheKeyList, service.getRoleCacheKey(pid))
+		}
+		if len(cacheKeyList) > 0 {
+			var cachedModel *adminModel.AdminRole
+			for _, key := range cacheKeyList {
+				err = roleCacheObj.Get(key, &cachedModel)
+				if err == nil {
+					result = append(result, cachedModel)
+				}
+			}
+		}
+		for _, pid := range pIds {
+			exisit := false
+			for _, roleObj := range result {
+				if roleObj != nil && pid == roleObj.PId {
+					exisit = true
+					break
+				}
+			}
+			if !exisit {
+				notExisitPids = append(notExisitPids, pid)
+			}
+		}
+
+		if notExisitPids != nil && len(notExisitPids) > 0 {
+			var roleObjs []*adminModel.AdminRole
+			defaultOrm.DB.Where("PId in (?)", notExisitPids).Find(&roleObjs)
+			if roleObjs != nil {
+				for _, roleObj := range roleObjs {
+					if roleObj != nil {
+						cacheKey := service.getRoleCacheKey(roleObj.PId)
+						roleCacheObj.Put(cacheKey, roleObj, 1000*60*60*24)
+						result = append(result, roleObj)
+					}
+
+				}
+
+			}
+		}
+	}
+	return result
+}
+
 /**
 *查询角色
 * @param creatUser 创建用户

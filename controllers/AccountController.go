@@ -4,6 +4,7 @@ import (
 	//"net/http"
 
 	// global "github.com/cn-joyconn/goadmin/models/global"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -24,6 +25,7 @@ type AccountController struct {
 // @Tags LoginPage
 // @Summary 用户登录
 func (controller *AccountController) LoginPage(c *gin.Context) {
+	fmt.Printf(c.HandlerName())
 	data := gin.H{
 		"pageTitle": "登录",
 	}

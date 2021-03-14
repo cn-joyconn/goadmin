@@ -3,7 +3,8 @@ package initialize
 import (
 	"net/http"
 
-	middleware "github.com/cn-joyconn/goadmin/middleware"
+	// middleware "github.com/cn-joyconn/goadmin/middleware"
+	auth "github.com/cn-joyconn/goadmin/middleware/auth"
 	global "github.com/cn-joyconn/goadmin/models/global"
 	routers "github.com/cn-joyconn/goadmin/routers"
 	gologs "github.com/cn-joyconn/gologs"
@@ -21,10 +22,13 @@ func RegistorRouters(Router *gin.Engine) {
 	PublicGroup := contextRouter.Group("")
 	AuthGroup := contextRouter.Group("")
 	PermissioneGroup := contextRouter.Group("")
-	AuthGroup.Use(middleware.Authorize())
-	PermissioneGroup.Use(middleware.Permission())
-	routers.InitCommonRouter(PublicGroup, AuthGroup, PermissioneGroup)
-	routers.InitAccountRouter(PublicGroup, AuthGroup, PermissioneGroup)
+	AuthGroup.Use(auth.Authorize())
+	PermissioneGroup.Use(auth.Permission())
+	JoyAuthorizeGroup := &auth.JoyAuthorizeGroup{GinGroup:AuthGroup}
+	JoyPermissionGroup := &auth.JoyPermissionGroup{GinGroup:PermissioneGroup}
+
+	routers.InitCommonRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
+	routers.InitAccountRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
 
 	// {
 	// 	router.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权

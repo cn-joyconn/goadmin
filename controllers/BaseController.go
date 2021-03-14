@@ -5,16 +5,19 @@ import (
 
 	global "github.com/cn-joyconn/goadmin/models/global"
 	"github.com/gin-gonic/gin"
+	// gologs "github.com/cn-joyconn/gologs"
 	// "strconv"
 )
 
 type BaseController struct {
-	gin.Context
+	//gin.Context
 }
 
 // 设置模板
 // 第一个参数模板，第二个参数为data
 func (bc *BaseController) ResponseHtml(c *gin.Context, name string, data gin.H) {
+	// gologs.GetLogger("").Info(c.FullPath())
+	// gologs.GetLogger("").Info(c.Request.RequestURI)
 	if data == nil {
 		data = make(map[string]interface{})
 	}

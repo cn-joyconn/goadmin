@@ -133,10 +133,9 @@ func (th *TokenHelper) SetAuthenticationToken2(uid string, pwd string, path stri
 					cookieDomain = ""
 				}
 				c.SetCookie(th.getLoginTokenCookieName(), token, 0, path, cookieDomain, false, false)
-			} else {
-				c.Request.Header.Set("Access-Control-Expose-Headers", th.LoginTokenName)
-				c.Request.Header.Set(th.LoginTokenName, token)
-			}
+			} 		
+			c.Request.Header.Set("Access-Control-Expose-Headers", th.LoginTokenName)
+			c.Request.Header.Set(th.LoginTokenName, token)
 
 		}
 	} else {
@@ -151,17 +150,18 @@ func (th *TokenHelper) SetAuthenticationToken2(uid string, pwd string, path stri
 * @param request
 * @return
  */
-func (th *TokenHelper) GetMyAuthToken(c *gin.Context) *LoginTokenID {
+func (th *TokenHelper) GetMyAuthToken(c *gin.Context) ( *LoginTokenID,bool) {
 	return th.GetMyAuthToken2(c, th.LoginTokenKey)
 }
-func (th *TokenHelper) GetMyAuthToken2(c *gin.Context, tokenKey string) *LoginTokenID {
-
+func (th *TokenHelper) GetMyAuthToken2(c *gin.Context, tokenKey string)( *LoginTokenID,bool) {
+	byCookie := false
 	token := c.Request.Header.Get(th.LoginTokenName)
 	if strtool.IsBlank(token) {
 		cookie, err := c.Cookie(th.LoginTokenName)
 		if err != nil {
 			token = ""
 		} else {
+			byCookie = true
 			token = cookie
 		}
 	}
@@ -169,10 +169,10 @@ func (th *TokenHelper) GetMyAuthToken2(c *gin.Context, tokenKey string) *LoginTo
 	if !strtool.IsBlank(token) {
 		ltID = ParseLoginTokenID(token, tokenKey)
 	}
-	return ltID
+	return ltID,byCookie
 }
 func (th *TokenHelper) GetMyAuthenticationID(c *gin.Context) string {
-	loginTokenID := th.GetMyAuthToken(c)
+	loginTokenID,_ := th.GetMyAuthToken(c)
 	if loginTokenID != nil {
 		return loginTokenID.Uid
 	} else {

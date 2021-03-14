@@ -3,6 +3,7 @@ package admin
 import (
 	// "encoding/json"
 	// "crypto/md5"
+	"encoding/json"
 	"regexp"
 	"strconv"
 
@@ -42,11 +43,20 @@ func (service *AdminUserService) GetSaltPwd(password string) string {
 func (service *AdminUserService) getUserCachekey(userId string) string {
 	return "user_" + userId
 }
+// 获取缓存用的键
+// userId 用户id
+// 返回值 缓存key
+func (service *AdminUserService) getUserRoleCachekey(userId string) string {
+	return "user_role_" + userId
+}
 
 // 删除缓存
 // userId 用户id
 func (service *AdminUserService) removeUserCache(userId string) {
 	userCacheObj.Delete(service.getUserCachekey(userId))
+}
+func (service *AdminUserService) removeUserRoleCache(userId string){
+	userCacheObj.Delete(service.getUserRoleCachekey(userId))
 }
 
 // 是否是用户名
@@ -282,7 +292,7 @@ func (service *AdminUserService) GetUserByEmail(email string) *adminModel.AdminU
 * @param userIDs
 * @return
  */
-func (service *AdminUserService) GetUserInfoByUserCDS(userIDs []string) []*adminModel.AdminUserBasic {
+func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*adminModel.AdminUserBasic {
 	if userIDs == nil {
 		return nil
 	}
@@ -337,6 +347,29 @@ func (service *AdminUserService) GetUserInfoByUserCDS(userIDs []string) []*admin
 			}
 		}
 	}
+	return result
+}
+func (service *AdminUserService) GetUserRolesByUid(uid string) []*adminModel.XAdminRoleLimit {
+	cacheKey := service.getUserRoleCachekey(uid)
+	var result []*adminModel.XAdminRoleLimit
+	err := resouceCacheObj.Get(cacheKey, &result)
+	if err != nil || result == nil {
+		var adminUserModel adminModel.AdminUser
+		defaultOrm.DB.Where(" ID = ?",uid).First(&adminUserModel)
+		if adminUserModel.ID >0 {
+			if strtool.IsBlank(adminUserModel.PRoles){
+				result = make([]*adminModel.XAdminRoleLimit, 0)
+			}else{
+				err=json.Unmarshal([]byte(adminUserModel.PRoles),&result)
+				if err!=nil{
+					result = make([]*adminModel.XAdminRoleLimit, 0)
+				}
+			}
+			resouceCacheObj.Put(cacheKey, result, 1000*60*60*24)
+			
+		}
+	}
+
 	return result
 }
 
@@ -426,7 +459,33 @@ func (service *AdminUserService) UpdateUserPubInfo(uid int, Alias string, Sex ui
 	}
 
 }
+func (service *AdminUserService) UpdateUserRoles(uid int, userRoles []*adminModel.XAdminRoleLimit) int {
 
+	var obj *adminModel.AdminUser
+	defaultOrm.DB.First(&obj, uid)
+	if obj == nil {
+		return -1
+	}
+	PRolesBytes,err := json.Marshal(userRoles)
+	if err==nil{
+		obj.PRoles = string(PRolesBytes)
+		result := defaultOrm.DB.Model(&obj).Select("PRoles").Updates(obj)
+		if result.Error != nil {
+			gologs.GetLogger("orm").Error(result.Error.Error())
+			return -1
+		}
+		if result.RowsAffected > 0 {
+			service.removeUserCache(strconv.Itoa(uid))
+			return 1
+		} else {
+			return -1
+		}
+	}else{
+		return -1
+	}
+	
+
+}
 //UpdateState 修改一个用户的认证状态
 //  userID 用户ID
 //  state 状态
@@ -567,3 +626,4 @@ func (service *AdminUserService) DeleteUser(userID int) int64 {
 	}
 	return result.RowsAffected
 }
+

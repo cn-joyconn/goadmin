@@ -10,6 +10,7 @@ import (
 	global "github.com/cn-joyconn/goadmin/models/global"
 	gocache "github.com/cn-joyconn/gocache"
 	gologs "github.com/cn-joyconn/gologs"
+	joyarray "github.com/cn-joyconn/goutils/array"
 )
 
 var roleResouceCacheObj *gocache.Cache
@@ -82,7 +83,7 @@ func (service *AdminRoleResourceService) DeleteByResourceID(pResource int) int64
 * @param records 角色-功能资源对应信息实例
 * @return 结果 1:成功 小于1:失败
  */
-func (service *AdminRoleResourceService) Inserts(roleid uint32, resourceids []uint32) int {
+func (service *AdminRoleResourceService) Inserts(roleid int, resourceids []int) int {
 	records := make([]*adminModel.AdminRoleResource, 0)
 	if resourceids != nil && len(resourceids) > 0 {
 		for _, id := range resourceids {
@@ -119,8 +120,8 @@ func (service *AdminRoleResourceService) SelectByPrimaryKey(pId int) *adminModel
 * @param roleid 信息id
 * @return  未找到时返回null
  */
-func (service *AdminRoleResourceService) SelectByRoleID(roleid int) []uint32 {
-	var result = make([]uint32, 0)
+func (service *AdminRoleResourceService) SelectByRoleID(roleid int) []int {
+	var result = make([]int, 0)
 	cacheKey := service.getRoleResourcesCacheKey(roleid)
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
@@ -136,15 +137,70 @@ func (service *AdminRoleResourceService) SelectByRoleID(roleid int) []uint32 {
 
 	return result
 }
+func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) []*adminModel.AdminRoleResource {
+	if roleids == nil {
+		return nil
+	}
+	cacheKeyList := make([]string, 0)
+	notExisitIDs := make([]int, 0)
+	var err error
+
+	result := make([]*adminModel.AdminRoleResource, 0)
+	roleids = joyarray.RemoveDuplicateInt(roleids)
+	if roleids != nil {
+		for _, roleID := range roleids {
+			cacheKeyList = append(cacheKeyList, service.getRoleResourcesCacheKey(roleID))
+		}
+		if len(cacheKeyList) > 0 {
+			var cachedModel *adminModel.AdminRoleResource
+			for _, key := range cacheKeyList {
+				err = roleResouceCacheObj.Get(key, &cachedModel)
+				if err == nil {
+					result = append(result, cachedModel)
+				}
+			}
+		}
+		for _, roleID := range roleids {
+			exisit := false
+			for _, resourceObj := range result {
+				if resourceObj != nil && roleID == int(resourceObj.PRoleid) {
+					exisit = true
+					break
+				}
+			}
+			if !exisit {
+				notExisitIDs = append(notExisitIDs, roleID)
+			}
+		}
+
+		if notExisitIDs != nil && len(notExisitIDs) > 0 {
+			var models []*adminModel.AdminRoleResource
+			defaultOrm.DB.Where("PRoleid in (?)", notExisitIDs).Find(&models)
+			if models != nil {
+				for _, model := range models {
+					if model != nil {
+						cacheKey := service.getRoleResourcesCacheKey(int(model.PRoleid))
+						roleResouceCacheObj.Put(cacheKey, model, 1000*60*60*24)
+						result = append(result, model)
+					}
+
+				}
+
+			}
+		}
+	}
+	return result
+
+}
 
 /**
 *查询一条功能资源对应的所有角色ID
 * @param pResource 功能资源
 * @return  未找到时返回null
  */
-func (service *AdminRoleResourceService) SelectByResourceID(pResource int) []uint32 {
+func (service *AdminRoleResourceService) selectByResourceID(pResource int) []int {
 	var models []*adminModel.AdminRoleResource
-	var result = make([]uint32, 0)
+	var result = make([]int, 0)
 	defaultOrm.DB.Where("PResource = ?", pResource).Find(&models)
 	if models != nil {
 		for _, model := range models {

@@ -4,6 +4,8 @@ import (
 	// "net/http"
 
 	controllers "github.com/cn-joyconn/goadmin/controllers"
+	"github.com/cn-joyconn/goadmin/middleware/auth"
+
 	// filetool "github.com/cn-joyconn/goutils/filetool"
 	// gologs "github.com/cn-joyconn/gologs"
 	// middleware "github.com/cn-joyconn/goadmin/middleware"
@@ -11,7 +13,7 @@ import (
 )
 
 //通用
-func InitCommonRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, permissioneGroup *gin.RouterGroup) {
+func InitCommonRouter(publicGroup *gin.RouterGroup, authGroup *auth.JoyAuthorizeGroup, permissioneGroup *auth.JoyPermissionGroup) {
 	controller := &controllers.CommonController{}
 	commonRouter := publicGroup.Group("common")
 	{
@@ -21,21 +23,24 @@ func InitCommonRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, 
 }
 
 //登录
-func InitAccountRouter(publicGroup *gin.RouterGroup, authGroup *gin.RouterGroup, permissioneGroup *gin.RouterGroup) {
+func InitAccountRouter(publicGroup *gin.RouterGroup, authGroup *auth.JoyAuthorizeGroup, permissioneGroup *auth.JoyPermissionGroup) {
 	controller := &controllers.AccountController{}
 	accountRouter := publicGroup.Group("account")
 	{
 		accountRouter.GET("login", controller.LoginPage)
-		accountRouter.POST("dologin", controller.LoginApi)
+		accountRouter.POST("login", controller.LoginPage)
+		accountRouter.POST("dologin", controller.LoginForCookie)
+		accountRouter.POST("dologinAuth", controller.LoginForAuth)
 	}
 	// myInfoRouter := authGroup.Group("myinfo")
 	// {
 	// 	myInfoRouter.GET("getme", controller.LoginPage)
 	// }
-	// userRouter := publicGroup.Group("user")
-	// {
-	// 	userRouter.GET("list", controller.LoginPage)
-	// 	userRouter.POST("update", controller.LoginApi)
-	// }
+	userRouter := permissioneGroup.Group("user")
+	{
+		userRouter.GET("list", "", controller.LoginForAuth)
+		// userRouter.GET("list", controller.LoginPage)
+		// userRouter.POST("update", controller.LoginApi)
+	}
 
 }
