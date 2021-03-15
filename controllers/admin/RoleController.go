@@ -22,6 +22,14 @@ var adminRoleResourceService *adminServices.AdminRoleResourceService
 func init() {
 	adminRoleService = &adminServices.AdminRoleService{}
 }
+func (controller *RoleController) ManagePage(c *gin.Context) {
+	// fmt.Printf(c.HandlerName())
+	data := gin.H{
+		"pageTitle": "菜单管理",
+	}
+
+	controller.ResponseHtml(c, "authorize/role", data)
+}
 
 /**
  * 修改角色状态角色

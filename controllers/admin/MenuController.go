@@ -22,6 +22,14 @@ func init() {
 	MenuService = &adminServices.AdminMenuService{}
 }
 
+func (controller *MenuController) ManagePage(c *gin.Context) {
+	// fmt.Printf(c.HandlerName())
+	data := gin.H{
+		"pageTitle": "菜单管理",
+	}
+	
+	controller.ResponseHtml(c, "authorize/menu", data)
+}
 /**
  * 修改菜单状态菜单
  *

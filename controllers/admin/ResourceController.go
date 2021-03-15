@@ -19,7 +19,14 @@ var ResourceService *adminServices.AdminResourceService
 func init(){
 	ResourceService = &adminServices.AdminResourceService{}
 }
-
+func (controller *ResourceController) ManagePage(c *gin.Context) {
+	// fmt.Printf(c.HandlerName())
+	data := gin.H{
+		"pageTitle": "菜单管理",
+	}
+	
+	controller.ResponseHtml(c, "authorize/Resource", data)
+}
 /**
 * 删除功能权限
 *

@@ -23,6 +23,28 @@ var adminUserService *adminServices.AdminUserService
 func init() {
 	adminUserService = &adminServices.AdminUserService{}
 }
+func (controller *UserController) ManagePage(c *gin.Context) {
+	// fmt.Printf(c.HandlerName())
+	data := gin.H{
+		"pageTitle": "菜单管理",
+	}
+
+	controller.ResponseHtml(c, "authorize/userList", data)
+}
+func (controller *UserController) ModifyphotoPage(c *gin.Context) {
+	// fmt.Printf(c.HandlerName())
+	data := gin.H{
+		"pageTitle": "修改头像",
+	}
+	userObj := controller.GetContextUserObj(c)
+	if userObj == nil || strtool.IsBlank(userObj.HeadPortrait) {
+		data["userPhoto"] = global.AppConf.ContextPath + "/static/plugins/adminlte/img/user2-160x160.jpg"
+	} else {
+		data["userPhoto"] = userObj.HeadPortrait
+	}
+
+	controller.ResponseHtml(c, "authorize/modifyphoto", data)
+}
 
 /**
 * 获取用户列表
