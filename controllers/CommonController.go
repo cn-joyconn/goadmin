@@ -4,7 +4,9 @@ import (
 	"image/color"
 	"strconv"
 
+	"github.com/cn-joyconn/goadmin/models/global"
 	"github.com/cn-joyconn/goadmin/utils/joyCaptcha"
+	"github.com/cn-joyconn/goadmin/utils/saveFile"
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
 )
@@ -49,41 +51,15 @@ func (controller *CommonController) AuthImage(c *gin.Context) {
 	controller.ApiSuccess(c, id, b64s)
 }
 
-//文件上传
-// func (c *CommonController) Upload(){
-// 	var files models.Files
-// 	adminUser := c.GetSession("admin_user")
-// 	if adminUser != nil{
-// 		//后台用户
-// 		files.AdminUserId = adminUser.(*models.AdminUser).Id
-// 	}
-// 	// TODO 这里预留未设置前台用户ID
+// 文件上传
+func (controller *CommonController) Upload(c *gin.Context) {
 
-// 	_ = c.Ctx.Input.Bind(&files.Type, "type")
-// 	_ = c.Ctx.Input.Bind(&files.Remark, "remark")
-// 	//保存文件
-// 	f, h, err := c.GetFile("file")
-// 	defer f.Close()
-// 	if err != nil {
-// 		c.ApiError("文件上传失败",nil)
-// 	}
-// 	if logic.CheckFileExt(h.Filename) == false{
-// 		c.ApiError("后缀名不符合上传要求",nil)
-// 	}
-// 	//自动创建日期文件夹
-// 	newDir := logic.AutoCreateUploadDateDir("head_images")
-// 	//生成新的文件路径
-// 	newFilePath := newDir + "/" + utils.GetRandomString(32) + path.Ext(h.Filename)
-// 	_ = c.SaveToFile("file", newFilePath)
-// 	//将图片保存到数据库
-// 	files.FilePath = newFilePath
-// 	o := orm.NewOrm()
-// 	_, err = o.Insert(&files)
-// 	if err != nil{
-// 		c.ApiError("文件数据上传失败",nil)
-// 	}
-// 	//得到图片的完整路径
-// 	fullNewFilePath := logic.GetFullPath(c.Ctx,newFilePath)
-// 	fmt.Println(fullNewFilePath)
-// 	c.ApiSuccess("上传成功",map[string]interface{}{"path":fullNewFilePath})
-// }
+	file, _ := c.FormFile("file")
+	newFilePath, returnUrl := saveFile.GetSaveFilePath(file, global.AppConf.Upload)
+	err := c.SaveUploadedFile(file, newFilePath)
+	if err == nil {
+		controller.ApiSuccess(c, "上传成功", returnUrl)
+	} else {
+		controller.ApiSuccess(c, "上传失败", "")
+	}
+}

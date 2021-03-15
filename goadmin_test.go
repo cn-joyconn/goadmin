@@ -71,7 +71,7 @@ func TestUpdateUser(t *testing.T) {
 	obj.Phone = "18333660110"
 	obj.Alias = "测试用户A"
 	obj.Sex = 1
-	updateResult := service.UpdateUserPubInfo(22, "测试用户A", 1, "", "")
+	updateResult := service.UpdateUserPubInfo(obj)
 	gologs.GetLogger("test").Info(strconv.Itoa(updateResult))
 
 	obj = service.GetUserByUserID("22")

@@ -118,3 +118,5 @@ func (group *JoyAuthorizeGroup) Any( relativePath string, permission string, han
 	group.registerHandlerPermission(permission, handlers...)
 	return group.GinGroup.Any(relativePath, handlers...)
 }
+
+

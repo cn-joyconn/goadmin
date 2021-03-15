@@ -9,6 +9,14 @@ app:
   jspath : /admin       #js访问相对路径
   imagepath : /admin    #image访问相对路径
   filepath : /admin     #file访问相对路径
+  upload :              #上传文件设置
+    maxRequestSize :  20Mb #上传文件内存限制         
+    visitDomain :   #上传图片后访问的域名
+    visitPath : / #上传图片后的访问路径
+    savePath : /uploadfiles/upload/ #保存路径
+    uploadRemote : false #是否上传到远程服务器 否false 是true
+    remoteUploadUrl : http://127.0.0.1:9080/file/uploadfile #文件站点服务器的接口地址
+    remoteUploadkey : 7h(sllG_ #接口key
   cache :              #缓存catalog 及 CacheName ; map 类型
     adminCatalog : joyconn    #damin模块 缓存类别
     adminName : admin         #admin模块 缓存名称

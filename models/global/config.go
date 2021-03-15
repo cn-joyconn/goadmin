@@ -1,6 +1,9 @@
 package global
 
 import (
+	"strconv"
+	"strings"
+
 	gologs "github.com/cn-joyconn/gologs"
 	array "github.com/cn-joyconn/goutils/array"
 	filetool "github.com/cn-joyconn/goutils/filetool"
@@ -26,11 +29,22 @@ type AppConfig struct {
 	ImagePath       string            `json:"imagepath" yaml:"imagepath"`             //image访问路径
 	FilePath        string            `json:"filepath" yaml:"filepath"`               //file访问路径
 	Cache           map[string]string `json:"cache" yaml:"cache"`                     //缓存catalog 及 CacheName
-	Authorize       AuthorizeCfg      `json:"authorize" yaml:"authorize"`             //登录认证相关配置
+	Authorize       *AuthorizeCfg      `json:"authorize" yaml:"authorize"`             //登录认证相关配置
 	SnowflakeWorkID int64             `json:"snowflakeWorkID" yaml:"snowflakeWorkID"` //全局唯一ID工作节点（雪花算法节点）
+	Upload          *UploadCfg         `json:"upload" yaml:"upload"`                   //上传文件设置
 }
 type appConfigs struct {
 	App AppConfig `json:"app" yaml:"app"`
+}
+type UploadCfg struct {
+	MaxRequestSize  string `json:"maxRequestSize" yaml:"maxRequestSize"`   // 上传文件内存限制
+	VisitDomain     string `json:"visitDomain" yaml:"visitDomain"`         // 上传图片后访问的域名
+	VisitPath       string `json:"visitPath" yaml:"visitPath"`             // 上传图片后的访问路径
+	SavePath        string `json:"savePath" yaml:"savePath"`               // 保存路径
+	UploadRemote    bool   `json:"uploadRemote" yaml:"uploadRemote"`       // 是否上传到远程服务器 否false 是true
+	RemoteUploadUrl string `json:"remoteUploadUrl" yaml:"remoteUploadUrl"` // 文件站点服务器的接口地址
+	RemoteUploadkey string `json:"remoteUploadkey" yaml:"remoteUploadkey"` // 接口key
+
 }
 
 //DBConfig 数据库配置
@@ -96,6 +110,34 @@ type AuthorizeCookie struct {
 	LoginTokenAesKey string `json:"loginTokenAesKey" yaml:"loginTokenAesKey"` //认证令牌aes加密key
 }
 
+func (cfg *UploadCfg) GetMaxRequestSize() int64 {
+	MaxRequestSize := strings.ToLower(cfg.MaxRequestSize)
+	keeplen := len(MaxRequestSize)
+	jinzhi := 0
+	if strings.HasSuffix(MaxRequestSize, "mb") {
+		keeplen = len(MaxRequestSize) - 2
+		jinzhi = 20
+	} else if strings.HasSuffix(MaxRequestSize, "gb") {
+		keeplen = len(MaxRequestSize) - 2
+		jinzhi = 30
+	} else if strings.HasSuffix(MaxRequestSize, "kb") {
+		keeplen = len(MaxRequestSize) - 2
+		jinzhi = 10
+	} else if strings.HasSuffix(MaxRequestSize, "b") {
+		keeplen = len(MaxRequestSize) - 1
+		jinzhi = 0
+	} else if strings.HasSuffix(MaxRequestSize, "tb") {
+		keeplen = len(MaxRequestSize) - 2
+		jinzhi = 40
+	}
+	sizeStr := MaxRequestSize[:keeplen]
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		return 0
+	} else {
+		return int64(size) << jinzhi
+	}
+}
 func InitAppConf(configPath string) {
 	if filetool.IsExist(configPath) {
 		configBytes, err := filetool.ReadFileToBytes(configPath)

@@ -62,6 +62,8 @@ func (service *AdminResourceService) DeleteByPrimaryKey(pId int) int64 {
 		return 0
 	}
 	if result.RowsAffected > 0 {
+		roleResourceService :=&AdminRoleResourceService{}
+		roleResourceService.DeleteByResourceID(pId)
 		service.removeResourceCache(obj)
 	}
 	return result.RowsAffected

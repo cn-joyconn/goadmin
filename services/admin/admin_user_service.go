@@ -15,7 +15,6 @@ import (
 	gocache "github.com/cn-joyconn/gocache"
 	gologs "github.com/cn-joyconn/gologs"
 	joyarray "github.com/cn-joyconn/goutils/array"
-	encrypt "github.com/cn-joyconn/goutils/encrypt"
 	strtool "github.com/cn-joyconn/goutils/strtool"
 )
 
@@ -43,6 +42,7 @@ func (service *AdminUserService) GetSaltPwd(password string) string {
 func (service *AdminUserService) getUserCachekey(userId string) string {
 	return "user_" + userId
 }
+
 // 获取缓存用的键
 // userId 用户id
 // 返回值 缓存key
@@ -55,7 +55,7 @@ func (service *AdminUserService) getUserRoleCachekey(userId string) string {
 func (service *AdminUserService) removeUserCache(userId string) {
 	userCacheObj.Delete(service.getUserCachekey(userId))
 }
-func (service *AdminUserService) removeUserRoleCache(userId string){
+func (service *AdminUserService) removeUserRoleCache(userId string) {
 	userCacheObj.Delete(service.getUserRoleCachekey(userId))
 }
 
@@ -179,7 +179,7 @@ func (service *AdminUserService) Login(loginID string, password string, loginTyp
 	if authenticationInfoModel != nil {
 		var pwd = password
 		if !isEncryptPwd {
-			pwd = encrypt.MakeMD5Str(strconv.Itoa(authenticationInfoModel.ID) + "\f" + password)
+			pwd = service.GetSaltPwd(password)
 		}
 		code := service.validationLogin(authenticationInfoModel, pwd)
 		return authenticationInfoModel, code
@@ -355,18 +355,18 @@ func (service *AdminUserService) GetUserRolesByUid(uid string) []*adminModel.XAd
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
 		var adminUserModel adminModel.AdminUser
-		defaultOrm.DB.Where(" ID = ?",uid).First(&adminUserModel)
-		if adminUserModel.ID >0 {
-			if strtool.IsBlank(adminUserModel.PRoles){
+		defaultOrm.DB.Where(" ID = ?", uid).First(&adminUserModel)
+		if adminUserModel.ID > 0 {
+			if strtool.IsBlank(adminUserModel.PRoles) {
 				result = make([]*adminModel.XAdminRoleLimit, 0)
-			}else{
-				err=json.Unmarshal([]byte(adminUserModel.PRoles),&result)
-				if err!=nil{
+			} else {
+				err = json.Unmarshal([]byte(adminUserModel.PRoles), &result)
+				if err != nil {
 					result = make([]*adminModel.XAdminRoleLimit, 0)
 				}
 			}
 			resouceCacheObj.Put(cacheKey, result, 1000*60*60*24)
-			
+
 		}
 	}
 
@@ -435,24 +435,24 @@ func (service *AdminUserService) InsertUserModel(adminUser *adminModel.AdminUser
 		return -1, nil
 	}
 }
-func (service *AdminUserService) UpdateUserPubInfo(uid int, Alias string, Sex uint8, HeadPortrait string, UserCD string) int {
+func (service *AdminUserService) UpdateUserPubInfo(obj *adminModel.AdminUser) int {
 
-	var obj *adminModel.AdminUser
-	defaultOrm.DB.First(&obj, uid)
-	if obj == nil {
-		return -1
-	}
-	obj.Alias = Alias
-	obj.Sex = Sex
-	obj.HeadPortrait = HeadPortrait
-	obj.UserCD = UserCD
+	// var obj *adminModel.AdminUser
+	// defaultOrm.DB.First(&obj, uid)
+	// if obj == nil {
+	// 	return -1
+	// }
+	// obj.Alias = Alias
+	// obj.Sex = Sex
+	// obj.HeadPortrait = HeadPortrait
+	// obj.UserCD = UserCD
 	result := defaultOrm.DB.Model(&obj).Select("Alias", "Sex", "HeadPortrait", "UserCD", "RealName", "Description", "Remarks").Updates(obj)
 	if result.Error != nil {
 		gologs.GetLogger("orm").Error(result.Error.Error())
 		return -1
 	}
 	if result.RowsAffected > 0 {
-		service.removeUserCache(strconv.Itoa(uid))
+		service.removeUserCache(strconv.Itoa(obj.ID))
 		return 1
 	} else {
 		return -1
@@ -466,8 +466,8 @@ func (service *AdminUserService) UpdateUserRoles(uid int, userRoles []*adminMode
 	if obj == nil {
 		return -1
 	}
-	PRolesBytes,err := json.Marshal(userRoles)
-	if err==nil{
+	PRolesBytes, err := json.Marshal(userRoles)
+	if err == nil {
 		obj.PRoles = string(PRolesBytes)
 		result := defaultOrm.DB.Model(&obj).Select("PRoles").Updates(obj)
 		if result.Error != nil {
@@ -480,12 +480,12 @@ func (service *AdminUserService) UpdateUserRoles(uid int, userRoles []*adminMode
 		} else {
 			return -1
 		}
-	}else{
+	} else {
 		return -1
 	}
-	
 
 }
+
 //UpdateState 修改一个用户的认证状态
 //  userID 用户ID
 //  state 状态
@@ -605,13 +605,32 @@ func (service *AdminUserService) UpdateUserLoginValue(pUserID int, phone string,
 func (service *AdminUserService) UpdateUserPassword(pUserID int, pPassword string) int64 {
 	updateObj := &adminModel.AdminUser{}
 	updateObj.ID = pUserID
-	updateObj.Password = pPassword
+	updateObj.Password = service.GetSaltPwd(pPassword)
 	result := defaultOrm.DB.Model(&updateObj).Select("Password").Updates(updateObj)
 	if result.Error != nil {
 		gologs.GetLogger("orm").Error(result.Error.Error())
 		return 0
 	}
 	return result.RowsAffected
+}
+//UpdateUserName 修改用户头像
+//  userID  用户ID
+//返回修改结果
+func (service *AdminUserService) UpdateUserHeadPortrait(pUserID int, HeadPortrait string) int64 {	
+	updateObj := &adminModel.AdminUser{}
+	updateObj.ID = pUserID
+	updateObj.HeadPortrait = HeadPortrait
+	result := defaultOrm.DB.Model(&updateObj).Select("HeadPortrait").Updates(updateObj)
+	if result.Error != nil {
+		gologs.GetLogger("orm").Error(result.Error.Error())
+		return 0
+	}
+	if result.RowsAffected > 0 {
+		service.removeUserCache(strconv.Itoa(pUserID))
+		return 1
+	} else {
+		return -1
+	}
 }
 
 //DeleteByUserID 删除一个用户的认证信息
@@ -626,4 +645,3 @@ func (service *AdminUserService) DeleteUser(userID int) int64 {
 	}
 	return result.RowsAffected
 }
-
