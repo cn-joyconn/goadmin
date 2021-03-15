@@ -32,6 +32,7 @@ func (controller *ResourceController)DeleteByPrimaryKey(c *gin.Context)  {
 	id , err := strconv.Atoi(fId)
 	if err!=nil{
 		controller.ApiErrorCode(c, "参数错误", "",global.ParamsError)	
+		return
 	}
 	result := ResourceService.DeleteByPrimaryKey(id)
 	if result>0{
@@ -109,6 +110,7 @@ func  (controller *ResourceController) selectRightByPrimaryKey(c *gin.Context) {
 	id , err := strconv.Atoi(fId)
 	if err!=nil{
 		controller.ApiErrorCode(c, "参数错误", "",global.ParamsError)	
+		return
 	}
 	result:=ResourceService.SelectByPrimaryKey(id)
 	if result != nil {

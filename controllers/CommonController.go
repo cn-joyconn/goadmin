@@ -63,3 +63,21 @@ func (controller *CommonController) Upload(c *gin.Context) {
 		controller.ApiSuccess(c, "上传失败", "")
 	}
 }
+
+// 文件上传
+func (controller *CommonController) UploadFiles(c *gin.Context) {
+	form, _ := c.MultipartForm()
+	files := form.File["upload[]"]
+	if files != nil && len(files) > 0 {
+		result := make([]string, len(files))
+		for _, file := range files {
+			newFilePath, returnUrl := saveFile.GetSaveFilePath(file, global.AppConf.Upload)
+			c.SaveUploadedFile(file, newFilePath)
+			result = append(result, returnUrl)
+		}
+		controller.ApiSuccess(c, "上传成功", result)
+	} else {
+		controller.ApiSuccess(c, "上传失败", "")
+	}
+
+}

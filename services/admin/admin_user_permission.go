@@ -11,26 +11,22 @@ import (
 	strtool "github.com/cn-joyconn/goutils/strtool"
 )
 
-
-
-
 type AdminUserPermissionService struct {
 }
-
 
 /**
 * 获取用户的权限列表
 *
 * @param uid
 * @return
-*/
-func (service *AdminUserPermissionService)GetUserRoles(uid int) []*adminModel.AdminRole{
-	roleids :=service.GetUserRoleIDs(uid)	
+ */
+func (service *AdminUserPermissionService) GetUserRoles(uid int) []*adminModel.AdminRole {
+	roleids := service.GetUserRoleIDs(uid)
 	if roleids != nil && len(roleids) > 0 {
 		adminRoleService := &AdminRoleService{}
 		result := adminRoleService.SelectByRoleIds(roleids)
 		return result
-	}else{
+	} else {
 		return nil
 	}
 }
@@ -40,76 +36,133 @@ func (service *AdminUserPermissionService)GetUserRoles(uid int) []*adminModel.Ad
 *
 * @param uid
 * @return
-*/
-func (service *AdminUserPermissionService)GetUserRoleIDs(uid int) []int {
-	if uid<0{
-		return nil;
+ */
+func (service *AdminUserPermissionService) GetUserRoleIDs(uid int) []int {
+	if uid < 0 {
+		return nil
 	}
 	// if global.IsSuperAdmin(uid) {
 	// 	return this.selectAllRole("", appid,1,Integer.MAX_VALUE);
 	// }
 	result := make([]int, 0)
 	adminUserService := &AdminUserService{}
-	userRolesModels := adminUserService.GetUserRolesByUid(strconv.Itoa(uid));
+	userRolesModels := adminUserService.GetUserRolesByUid(strconv.Itoa(uid))
 	if userRolesModels != nil && len(userRolesModels) > 0 {
-		for  _,roleLimitTimeModel :=range userRolesModels {
-			if roleLimitTimeModel!=nil && roleLimitTimeModel.IsEffectiveTime() {
-				result = append(result,roleLimitTimeModel.Role )
+		for _, roleLimitTimeModel := range userRolesModels {
+			if roleLimitTimeModel != nil && roleLimitTimeModel.IsEffectiveTime() {
+				result = append(result, roleLimitTimeModel.Role)
 			}
 		}
 	}
-	return result;
+	return result
 }
-	
+
 /**
 * 获取用户的权限列表
 *
 * @param uid
 * @return
-*/
-func  (service *AdminUserPermissionService)GetUserResources(userid string) []*adminModel.AdminResource{
-	if strtool.IsBlank(userid){
-		return nil;
-	}
-	uid,err:=strconv.Atoi(userid)
-	if err!=nil{
+ */
+func (service *AdminUserPermissionService) GetUserResources(userid string) []*adminModel.AdminResource {
+	if strtool.IsBlank(userid) {
 		return nil
 	}
-	adminResourceService :=&AdminResourceService{}
+	uid, err := strconv.Atoi(userid)
+	if err != nil {
+		return nil
+	}
+	adminResourceService := &AdminResourceService{}
 	if global.IsSuperAdmin(uid) {
 		return adminResourceService.SelectAll()
 	}
 	var result []*adminModel.AdminResource
 	roleIDs := service.GetUserRoleIDs(uid)
 	if roleIDs != nil && len(roleIDs) > 0 {
-		adminRoleResourceService :=&AdminRoleResourceService{}
+		adminRoleResourceService := &AdminRoleResourceService{}
 		resourceList := make([]int, 0)
 		var resourceIds []int
-		for _,roleID := range roleIDs {
-			if roleID!=0 {
+		for _, roleID := range roleIDs {
+			if roleID != 0 {
 				resourceIds = adminRoleResourceService.SelectByRoleID(roleID)
-				if resourceIds!=nil{					
-					for _,resourceId:=range resourceIds{
+				if resourceIds != nil {
+					for _, resourceId := range resourceIds {
 						resourceList = append(resourceList, resourceId)
 					}
 				}
 			}
 		}
-		if len(resourceList)>0{
+		if len(resourceList) > 0 {
 			result = adminResourceService.SelectByPrimaryKeys(resourceList)
 		}
-		
+
 	}
-	return result;
+	return result
 }
+/**
+* 获取用户的权限列表
+*
+* @param uid
+* @return
+ */
+ func (service *AdminUserPermissionService) GetUserResourceIDs(userid string) []int {
+	if strtool.IsBlank(userid) {
+		return nil
+	}
+	uid, err := strconv.Atoi(userid)
+	if err != nil {
+		return nil
+	}
+	result := make([]int, 0)
+	adminResourceService := &AdminResourceService{}
+	if global.IsSuperAdmin(uid) {
+		resourceList :=adminResourceService.SelectAll()
+		for _, resourceObj := range resourceList {
+			if resourceObj != nil {
+				result = append(result, resourceObj.PId)
+			}
+		}
+		return result
+	}
 	
+	roleIDs := service.GetUserRoleIDs(uid)
+	if roleIDs != nil && len(roleIDs) > 0 {
+		adminRoleResourceService := &AdminRoleResourceService{}
+		var resourceIds []int
+		for _, roleID := range roleIDs {
+			if roleID != 0 {
+				resourceIds = adminRoleResourceService.SelectByRoleID(roleID)
+				if resourceIds != nil {
+					for _, resourceId := range resourceIds {
+						result = append(result, resourceId)
+					}
+				}
+			}
+		}
+		
+		return result
+
+	}
+	return nil
+}
+func (service *AdminUserPermissionService) GetUserPermissions(userid string) []string {
+	models := service.GetUserResources(userid)
+	result := make( []string,0)
+	if models!=nil{
+		
+		for _,model:=range models{
+			result =append(result, model.PPermission)
+		}
+	}
+	return result
+
+}
 /**
 * 获取用户的权限列表数据
 *
 * @param uid
 * @return
-*/
-func  (service *AdminUserPermissionService)GetUserResourcesList(uid string) []*adminModel.AdminResource{
+ */
+func (service *AdminUserPermissionService) GetUserResourcesList(uid string) []*adminModel.AdminResource {
 	// result :=&adminModel.AdminResource{
 	// 	PId: 0,
 	// 	PDesc: "",
@@ -121,16 +174,16 @@ func  (service *AdminUserPermissionService)GetUserResourcesList(uid string) []*a
 	// 	Children:make([]*adminModel.AdminResource, 0),
 	// }
 	list := service.GetUserResources(uid)
-	return list;
+	return list
 }
-	
+
 /**
 * 获取用户的权限列表数据
 *
 * @param uid
 * @return
-*/
-func (service *AdminUserPermissionService)GetUserResourcesTreeForMenu(uid string) []*adminModel.AdminResource{
+ */
+func (service *AdminUserPermissionService) GetUserResourcesListForMenu(uid string) []*adminModel.AdminResource {
 	// result :=&adminModel.AdminResource{
 	// 	PId: 0,
 	// 	PDesc: "",
@@ -142,10 +195,10 @@ func (service *AdminUserPermissionService)GetUserResourcesTreeForMenu(uid string
 	// 	Children:make([]*adminModel.AdminResource, 0),
 	// }
 	list := service.GetUserResources(uid)
-	
-	menuResourcesList :=make([]*adminModel.AdminResource, 0)
-	for _,adminResourceModel :=range list{
-		if adminResourceModel.PType>0{
+
+	menuResourcesList := make([]*adminModel.AdminResource, 0)
+	for _, adminResourceModel := range list {
+		if adminResourceModel.PType > 0 {
 			menuResourcesList = append(menuResourcesList, adminResourceModel)
 		}
 
@@ -153,6 +206,7 @@ func (service *AdminUserPermissionService)GetUserResourcesTreeForMenu(uid string
 	// return list2Tree(result, menuResourcesList);
 	return menuResourcesList
 }
+
 // func  (service *AdminUserPermissionService)GetUserResourcesTree(list []*adminModel.AdminResource) *adminModel.AdminResource{
 // 	result :=&adminModel.AdminResource{
 // 		PId: 0,
@@ -173,98 +227,95 @@ func (service *AdminUserPermissionService)GetUserResourcesTreeForMenu(uid string
 * @param uid
 * @param resuorces
 * @return
-*/
-func   (service *AdminUserPermissionService)PathPermissin(userid string, resuorces []string) bool {
-	if strtool.IsBlank(userid){
-		return false;
+ */
+func (service *AdminUserPermissionService) PathPermissin(userid string, resuorces []string) bool {
+	if strtool.IsBlank(userid) {
+		return false
 	}
-	uid,err:=strconv.Atoi(userid)
-	if err!=nil{
+	uid, err := strconv.Atoi(userid)
+	if err != nil {
 		return false
 	}
 	if global.IsSuperAdmin(uid) {
-		return true;
-	}
-	if resuorces==nil || len(resuorces)==0 {
-		return false;
-	}
-	// JoyConnAuthenticatePermissionResourceModel joyConnAuthenticatePermissionResourceModel = null;
-	roleIDs := service.GetUserRoleIDs(uid);
-	if roleIDs==nil || len(roleIDs)==0 {
-		return false
-	}
-	adminResourceService :=&AdminResourceService{}
-	resourceModels := adminResourceService.SelectBypPermissions(resuorces)
-	if resourceModels==nil || len(resourceModels)==0 {
 		return true
 	}
-	adminRoleResourceService :=&AdminRoleResourceService{}
+	if resuorces == nil || len(resuorces) == 0 {
+		return false
+	}
+	// JoyConnAuthenticatePermissionResourceModel joyConnAuthenticatePermissionResourceModel = null;
+	roleIDs := service.GetUserRoleIDs(uid)
+	if roleIDs == nil || len(roleIDs) == 0 {
+		return false
+	}
+	adminResourceService := &AdminResourceService{}
+	resourceModels := adminResourceService.SelectBypPermissions(resuorces)
+	if resourceModels == nil || len(resourceModels) == 0 {
+		return true
+	}
+	adminRoleResourceService := &AdminRoleResourceService{}
 	roleResouceCacheObjs := adminRoleResourceService.SelectByRoleIDs(roleIDs)
 
-	for _,resource:=range resourceModels{
-		if resource !=nil  {
+	for _, resource := range resourceModels {
+		if resource != nil {
 			// List<Integer> resourceIDs =null;
-			for _,roleResouceCacheObj:= range roleResouceCacheObjs{
-				if roleResouceCacheObj.PResource==resource.PId{
-					return true;
+			for _, roleResouceCacheObj := range roleResouceCacheObjs {
+				if roleResouceCacheObj.PResource == resource.PId {
+					return true
 				}
 			}
 		}
 	}
 
-	return false;
+	return false
 }
 
-
 /**
-	* 获取用户是否具有该路径的访问权限
-	*
-	* @param uid
-	* @param resuorces
-	* @return
-	*/
-func   (service *AdminUserPermissionService)HasPathPermissin(userid string, resuorces []string)[]string {
-	permission := make([]string,0)
-	if strtool.IsBlank(userid){
-		return permission;
+* 获取用户是否具有该路径的访问权限
+*
+* @param uid
+* @param resuorces
+* @return
+ */
+func (service *AdminUserPermissionService) HasPathPermissin(userid string, resuorces []string) []string {
+	permission := make([]string, 0)
+	if strtool.IsBlank(userid) {
+		return permission
 	}
-	uid,err:=strconv.Atoi(userid)
-	if err!=nil{
+	uid, err := strconv.Atoi(userid)
+	if err != nil {
 		return permission
 	}
 	if global.IsSuperAdmin(uid) {
-		return resuorces;
+		return resuorces
 	}
-	if resuorces==nil || len(resuorces)==0 {
-		return permission;
+	if resuorces == nil || len(resuorces) == 0 {
+		return permission
 	}
-	roleIDs := service.GetUserRoleIDs(uid);
-	if roleIDs==nil || len(roleIDs)==0 {
+	roleIDs := service.GetUserRoleIDs(uid)
+	if roleIDs == nil || len(roleIDs) == 0 {
 		return permission
 	}
 	adminResourceService := &AdminResourceService{}
 	resourceModels := adminResourceService.SelectBypPermissions(resuorces)
-	if resourceModels==nil || len(resourceModels)==0 {
+	if resourceModels == nil || len(resourceModels) == 0 {
 		return permission
 	}
 	adminRoleResourceService := &AdminRoleResourceService{}
 	roleResouceCacheObjs := adminRoleResourceService.SelectByRoleIDs(roleIDs)
-	
 
-	for _,resource:=range resourceModels{
-		if resource !=nil  {
+	for _, resource := range resourceModels {
+		if resource != nil {
 			// List<Integer> resourceIDs =null;
-			for _,roleResouceCacheObj:= range roleResouceCacheObjs{
-				if roleResouceCacheObj.PResource==resource.PId{
+			for _, roleResouceCacheObj := range roleResouceCacheObjs {
+				if roleResouceCacheObj.PResource == resource.PId {
 					permission = append(permission, resource.PPermission)
-					break;
+					break
 				}
 			}
 		}
 	}
-	return permission;
+	return permission
 }
-
 
 // public static JoyConnAuthenticatePermissionResourceModel list2Tree(JoyConnAuthenticatePermissionResourceModel root, List<JoyConnAuthenticatePermissionResourceModel> ResourceList) {
 // 	ResourceList.sort((a, b)-> {if(a.getPLevel().equals(b.getPLevel())){return a.getpSort()-b.getpSort();}else{return a.getPLevel()-b.getPLevel();}});
@@ -291,7 +342,6 @@ func   (service *AdminUserPermissionService)HasPathPermissin(userid string, resu
 // 	}
 // 	return root;
 // }
-
 
 // public  static JoyConnAuthenticatePermissionMenuModel list2Tree(JoyConnAuthenticatePermissionMenuModel root, List<JoyConnAuthenticatePermissionMenuModel> menuList) {
 // 	menuList.sort((a, b)-> a.getpSort()-b.getpSort());
@@ -338,4 +388,3 @@ func   (service *AdminUserPermissionService)HasPathPermissin(userid string, resu
 
 // 	}
 // }
-

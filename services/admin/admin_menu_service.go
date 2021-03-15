@@ -40,7 +40,7 @@ func (service *AdminMenuService) removeMenuCache(pId int) {
 * @param pState 状态 1正常 0禁用
 * @return 结果 1:成功 小于1:失败
  */
-func (service *AdminMenuService) UpdateStateByPrimaryKey(pId int, pState uint8) int64 {
+func (service *AdminMenuService) UpdateStateByPrimaryKey(pId int, pState int) int64 {
 	record := &adminModel.AdminMenu{}
 	record.PId = pId
 	record.PState = pState
@@ -163,7 +163,3 @@ func (service *AdminMenuService) DeleteByPID(menuID int, pId int) int64 {
 	}
 	return result.RowsAffected
 }
-
-
-
-    
