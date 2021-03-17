@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cn-joyconn/goadmin/controllers"
+	"github.com/cn-joyconn/goadmin/models/global"
 	"github.com/cn-joyconn/goadmin/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -16,13 +17,13 @@ type JoyError struct {
 }
 
 var (
-	JoySuccess     = NewJoyError(http.StatusOK, 0, "success")
-	JoyServerError = NewJoyError(http.StatusInternalServerError, 200500, "系统异常，请稍后重试!")
-	JoyNotFound    = NewJoyError(http.StatusNotFound, 200404, http.StatusText(http.StatusNotFound))
+	JoySuccess     = NewJoyError(http.StatusOK, global.SUCCESS, "success")
+	JoyServerError = NewJoyError(http.StatusInternalServerError, global.ServiceError, "系统异常，请稍后重试!")
+	JoyNotFound    = NewJoyError(http.StatusNotFound, global.NotFound, http.StatusText(http.StatusNotFound))
 )
 
 func JoyOtherError(message string) *JoyError {
-	return NewJoyError(http.StatusForbidden, 100403, message)
+	return NewJoyError(http.StatusForbidden, global.ERROR, message)
 }
 
 func (e *JoyError) Error() string {
@@ -44,9 +45,11 @@ func HandleNotFound(c *gin.Context) {
 		c.JSON(err.StatusCode, err)
 	} else {
 		baseController := &controllers.BaseController{}
-		baseController.ResponseHtml(c, "layout/error_404.html", gin.H{
+		baseController.ResponseHtmlByStatusCode(c, "layout/error_404.html", 404, gin.H{
 			"pageTitle": "404错误",
 		})
+		// c.Request.Response.StatusCode = 404
+		c.Abort()
 	}
 
 	return
@@ -69,9 +72,11 @@ func ErrHandler() gin.HandlerFunc {
 					c.JSON(Err.StatusCode, Err)
 				} else {
 					baseController := &controllers.BaseController{}
-					baseController.ResponseHtml(c, "layout/error_500.html", gin.H{
+					// c.Request.Response.StatusCode = 500
+					baseController.ResponseHtmlByStatusCode(c, "layout/error_500.html", 500, gin.H{
 						"pageTitle": "500错误",
 					})
+					c.Abort()
 				}
 				return
 			}

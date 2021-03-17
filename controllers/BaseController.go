@@ -12,14 +12,16 @@ import (
 	// gologs "github.com/cn-joyconn/gologs"
 	// "strconv"
 )
+
 var adminUserService *adminServices.AdminUserService = new(adminServices.AdminUserService)
+
 type BaseController struct {
 	//gin.Context
 }
 
 // 设置模板
 // 第一个参数模板，第二个参数为data
-func (bc *BaseController) ResponseHtml(c *gin.Context, name string, data gin.H) {
+func (bc *BaseController) ResponseHtmlByStatusCode(c *gin.Context, name string, statusCode int, data gin.H) {
 	// gologs.GetLogger("").Info(c.FullPath())
 	// gologs.GetLogger("").Info(c.Request.RequestURI)
 	if data == nil {
@@ -36,7 +38,13 @@ func (bc *BaseController) ResponseHtml(c *gin.Context, name string, data gin.H) 
 		data["userInfo"] = userObj
 	}
 
-	c.HTML(http.StatusOK, name, data)
+	c.HTML(statusCode, name, data)
+}
+
+// 第一个参数模板，第二个参数为data
+func (bc *BaseController) ResponseHtml(c *gin.Context, name string, data gin.H) {
+
+	bc.ResponseHtmlByStatusCode(c, name, http.StatusOK, data)
 }
 
 //JSON输出
@@ -86,46 +94,44 @@ func (bc *BaseController) ApiErrorCode(c *gin.Context, msg string, data interfac
 // 	c.Redirect(route, 302)
 // }
 
-
-
-func  (bc *BaseController)GetContextUserId(c *gin.Context) int{
+func (bc *BaseController) GetContextUserId(c *gin.Context) int {
 	userid := bc.GetContextUserIdStr(c)
-	if strtool.IsBlank(userid){
+	if strtool.IsBlank(userid) {
 		return 0
 	}
-	uid,err:=strconv.Atoi(userid)
-	if err!=nil{
+	uid, err := strconv.Atoi(userid)
+	if err != nil {
 		return 0
 	}
 	return uid
 }
-func  (bc *BaseController)GetContextUserIdStr(c *gin.Context) string{
+func (bc *BaseController) GetContextUserIdStr(c *gin.Context) string {
 	userid := c.GetString(global.Context_UserId)
-	if !strtool.IsBlank(userid){
+	if !strtool.IsBlank(userid) {
 		userid = global.TokenHelper.GetMyAuthenticationID(c)
-		if !strtool.IsBlank(userid){
-			c.Set(global.Context_UserId,userid)
+		if !strtool.IsBlank(userid) {
+			c.Set(global.Context_UserId, userid)
 		}
 	}
 	return userid
-	
+
 }
-func  (bc *BaseController)GetContextUserObj(c *gin.Context) *adminModel.AdminUserBasic{
-	userObj,exist := c.Get(global.Context_UserInfo)
+func (bc *BaseController) GetContextUserObj(c *gin.Context) *adminModel.AdminUserBasic {
+	userObj, exist := c.Get(global.Context_UserInfo)
 	if !exist {
-		userid :=bc.GetContextUserIdStr(c)
-		if !strtool.IsBlank(userid){
-			var userids =make([]string,1)
+		userid := bc.GetContextUserIdStr(c)
+		if !strtool.IsBlank(userid) {
+			var userids = make([]string, 1)
 			userids[0] = userid
-			models:=adminUserService.GetUserInfoByUserIDS(userids)
-			
-			if models!=nil&&len(models)>0{
+			models := adminUserService.GetUserInfoByUserIDS(userids)
+
+			if models != nil && len(models) > 0 {
 				// userObj = models[0]
-				c.Set(global.Context_UserInfo,models[0])
+				c.Set(global.Context_UserInfo, models[0])
 				return models[0]
 			}
 		}
-	}else{
+	} else {
 		return userObj.(*adminModel.AdminUserBasic)
 	}
 	return nil

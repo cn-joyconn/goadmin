@@ -87,7 +87,7 @@
           return
         }
         $.get(
-          page_content_path + '/common/authimage',
+          page_content_path + '/api/CommApi/authimage',
             {
               height: 40,
               Width:80,
@@ -138,7 +138,7 @@
             $("#loginBTN").click(function () {
                 if (validateInput($("#username")) && validateInput($("#password"))&& validateInput($("#valcode"))) {
                     $.post(
-                        'dologin',
+                      page_content_path +'/api/joyconn/authorize/AuthenticationApi/dologin',
                         {
                           loginID: $("#username").val(),
                             pwd: $("#password").val(),
@@ -146,13 +146,16 @@
                             CaptchaID: loginPage_operat.data.CaptchaID
                         },
                         function (data) {
-                            if (data.code == -6) {
+                            if (data.code == 100403) {
                               JoyDialog({content: '请输入的正确的验证码'});
-                            } else if (data.code == -1) {
+                            }
+                            if (data.code == 100106) {
+                              JoyDialog({content: '请输入的正确的验证码'});
+                            } else if (data.code ==100101) {
                               JoyDialog({content: '服务器忙碌'});
-                            } else if (data.code == 2) {       
-                               $.cookie('goadmin_loginName',$("#username").val());                       
-                                window.location.href = page_content_path+"/page/joyconn/authorize/Permission/resource";
+                            } else if (data.code == 1) {       
+                              //  $.cookie('goadmin_loginName',$("#username").val());                       
+                                window.location.href = (page_content_path+"/").replace("//",'/');
                                 return;
                             } else {
                                 JoyDialog({content: '手机号或密码错误'});

@@ -31,7 +31,7 @@ app:
     cookie : 
       domain : 0.0.0.0 #令牌作用的域名，设置为abc.com对a.abc.com、b.abc.com均有效，设置a.abc.com对b.abc.com无效。cookie的作用域参加w3c，如果设置0.0.0.0则代表默认域名
       loginToken : goadmin_loginToken #认证令牌在cookie中的名称
-      loginTokenAesKey : I?vek2w\ 
+      loginTokenAesKey : I?vek2wlI?vek2wh  #16位固定长度
 
 
 

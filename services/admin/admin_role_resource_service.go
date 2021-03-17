@@ -110,9 +110,13 @@ func (service *AdminRoleResourceService) Inserts(roleid int, resourceids []int) 
 * @return  未找到时返回null
  */
 func (service *AdminRoleResourceService) SelectByPrimaryKey(pId int) *adminModel.AdminRoleResource {
-	var result *adminModel.AdminRoleResource
-	defaultOrm.DB.Where("PId = ?", pId).Find(&result)
-	return result
+	var result adminModel.AdminRoleResource
+	err:=defaultOrm.DB.Where("PId = ?", pId).Find(&result).Error
+	if err==nil{
+		return &result
+	}else{
+		return nil	
+	}
 }
 
 /**
@@ -125,11 +129,11 @@ func (service *AdminRoleResourceService) SelectByRoleID(roleid int) []int {
 	cacheKey := service.getRoleResourcesCacheKey(roleid)
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		var models []*adminModel.AdminRoleResource
-		defaultOrm.DB.Where("PRoleid = ?", roleid).Find(&models)
-		if models != nil {
+		var models []adminModel.AdminRoleResource
+		err:=defaultOrm.DB.Where("PRoleid = ?", roleid).Find(&models).Error
+		if err == nil {
 			for _, model := range models {
-				result = append(result, model.PResource)
+				result = append(result, (&model).PResource)
 			}
 		}
 		resouceCacheObj.Put(cacheKey, result, 1000*60*60*24)
@@ -174,15 +178,13 @@ func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) []*admin
 		}
 
 		if notExisitIDs != nil && len(notExisitIDs) > 0 {
-			var models []*adminModel.AdminRoleResource
-			defaultOrm.DB.Where("PRoleid in (?)", notExisitIDs).Find(&models)
-			if models != nil {
+			var models []adminModel.AdminRoleResource
+			err=defaultOrm.DB.Where("PRoleid in (?)", notExisitIDs).Find(&models).Error
+			if err == nil {
 				for _, model := range models {
-					if model != nil {
-						cacheKey := service.getRoleResourcesCacheKey(int(model.PRoleid))
-						roleResouceCacheObj.Put(cacheKey, model, 1000*60*60*24)
-						result = append(result, model)
-					}
+					cacheKey := service.getRoleResourcesCacheKey(int((&model).PRoleid))
+					roleResouceCacheObj.Put(cacheKey, &model, 1000*60*60*24)
+					result = append(result, &model)
 
 				}
 
@@ -199,12 +201,12 @@ func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) []*admin
 * @return  未找到时返回null
  */
 func (service *AdminRoleResourceService) selectByResourceID(pResource int) []int {
-	var models []*adminModel.AdminRoleResource
+	var models []adminModel.AdminRoleResource
 	var result = make([]int, 0)
-	defaultOrm.DB.Where("PResource = ?", pResource).Find(&models)
-	if models != nil {
+	err:=defaultOrm.DB.Where("PResource = ?", pResource).Find(&models).Error
+	if err == nil {
 		for _, model := range models {
-			result = append(result, model.PRoleid)
+			result = append(result, (&model).PRoleid)
 		}
 	}
 	return result

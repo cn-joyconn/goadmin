@@ -36,8 +36,6 @@ func (controller *MenuController) ManagePage(c *gin.Context) {
  * @param
  * @return
  */
-//  @RequestMapping(value = "updateState", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:menu:updateState"})
 func (controller *MenuController) UpdateState(c *gin.Context) {
 	//Integer Id, Integer state, HttpServletRequest request
 	fId := c.PostForm("Id")
@@ -68,8 +66,6 @@ func (controller *MenuController) UpdateState(c *gin.Context) {
  * @param
  * @return
  */
-//  @RequestMapping(value = "deleteMenuNode", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:menu:deleteMenuNode"})
 func (controller *MenuController) DeleteMenuNode(c *gin.Context) {
 	//Integer menuID, Integer pId, HttpServletRequest request
 	fId := c.PostForm("menuID")
@@ -101,8 +97,6 @@ func (controller *MenuController) DeleteMenuNode(c *gin.Context) {
  * @param
  * @return
  */
-//  @RequestMapping(value = "deleteMenu", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:menu:deleteMenu"})
 func (controller *MenuController) DeleteMenu(c *gin.Context) {
 	//Integer menuID,  HttpServletRequest request
 	fId := c.PostForm("menuID")
@@ -127,8 +121,6 @@ func (controller *MenuController) DeleteMenu(c *gin.Context) {
  * @param record
  * @return
  */
-//  @RequestMapping(value = "insert", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:menu:insert"})
 func (controller *MenuController) InsertMenu(c *gin.Context) {
 	var record adminModel.AdminMenu
 	c.ShouldBind(&record)
@@ -157,8 +149,6 @@ func (controller *MenuController) InsertMenu(c *gin.Context) {
  * @param record
  * @return
  */
-//  @RequestMapping(value = "update", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:menu:update"})
 func (controller *MenuController) UpdatetMenuByPrimaryKey(c *gin.Context) {
 	//JoyConnAuthenticatePermissionMenuModel record, HttpServletRequest request
 	var record adminModel.AdminMenu
@@ -186,8 +176,6 @@ func (controller *MenuController) UpdatetMenuByPrimaryKey(c *gin.Context) {
  * @param menuID
  * @return
  */
-//  @RequestMapping(value = "getMenu", method= RequestMethod.GET)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:menu:getMenu"})
 func (controller *MenuController) GetMenu(c *gin.Context) {
 	//Integer menuID, HttpServletRequest request
 	fId := c.PostForm("menuID")

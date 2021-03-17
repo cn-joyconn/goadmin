@@ -77,10 +77,10 @@ func (service *AdminMenuService) Insert(record *adminModel.AdminMenu) int {
 * @param pId 菜单id
 * @return  未找到时返回null
  */
-func (service *AdminMenuService) SelectMenuByID(pId int) *adminModel.AdminMenu {
-	var result *adminModel.AdminMenu
-	defaultOrm.DB.Where("PId = ?", pId).First(&result)
-	return result
+func (service *AdminMenuService) SelectMenuByID(pId int) (error,*adminModel.AdminMenu) {
+	var result adminModel.AdminMenu
+	err :=defaultOrm.DB.Where("PId = ?", pId).First(&result).Error
+	return err,&result
 }
 
 /**
@@ -88,13 +88,18 @@ func (service *AdminMenuService) SelectMenuByID(pId int) *adminModel.AdminMenu {
 * @param menuId 菜单id
 * @return  未找到时返回null
  */
-func (service *AdminMenuService) SelectMenuByMenuID(menuId int) []*adminModel.AdminMenu {
+func (service *AdminMenuService) SelectMenuByMenuID(menuId int)   []*adminModel.AdminMenu {
 	cacheKey := service.getMenuCacheKey(menuId)
 	var result []*adminModel.AdminMenu
 	err := menuCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		defaultOrm.DB.Where("PMenuID = ? and PState=1", menuId).Find(&result)
-		if result != nil {
+		var data []adminModel.AdminMenu
+		err=defaultOrm.DB.Where("PMenuID = ? and PState=1", menuId).Find(&data).Error
+		if err == nil { 
+			result = make([]*adminModel.AdminMenu, len(data))
+			for _,d :=range data{
+				result =append(result, &d)
+			}
 			menuCacheObj.Put(cacheKey, result, 1000*60*60*24)
 		}
 	}
@@ -108,16 +113,17 @@ func (service *AdminMenuService) SelectMenuByMenuID(menuId int) []*adminModel.Ad
 * @param limit 查询结果条数
 * @return  未找到时返回null
  */
-func (service *AdminMenuService) SelectRootByPage(creatUser string, pageIndex int, pageSize int) ([]*adminModel.AdminMenu, int64) {
-	var result []*adminModel.AdminMenu
-	var count int64
+func (service *AdminMenuService) SelectRootByPage(creatUser string, pageIndex int, pageSize int) (err error, list interface{}, total int64) {
+	var result []adminModel.AdminMenu
 	db := defaultOrm.DB
 	if !strtool.IsBlank(creatUser) {
 		db = db.Where("PCreatuserid = ?", creatUser)
 	}
-	db.Model(&adminModel.AdminMenu{}).Count(&count)
-	db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result)
-	return result, count
+	err=db.Model(&adminModel.AdminMenu{}).Count(&total).Error
+	if err==nil{		
+		err=db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+	}
+	return err,result, total
 }
 
 /**

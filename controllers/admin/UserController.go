@@ -51,9 +51,7 @@ func (controller *UserController) ModifyphotoPage(c *gin.Context) {
 *
 * @return
  */
-//  @RequestMapping(value = "getUserList", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources = {"api:iotdata:account:user:getUserList"})
-func (controller *UserController) getUserList(c *gin.Context) {
+func (controller *UserController) GetUserList(c *gin.Context) {
 	queryID := c.Query("searchID")
 	pageIndex := c.DefaultQuery("pageIndex", "1")
 	pageSize := c.DefaultQuery("pageSize", "10")
@@ -68,18 +66,23 @@ func (controller *UserController) getUserList(c *gin.Context) {
 		return
 	}
 	if strtool.IsBlank(queryID) {
-		models, count := adminUserService.SelectUserList(pagesize, pageindex)
-		controller.ApiDataList(c, "查询成功", models, count)
+		models, count ,err:= adminUserService.SelectUserList(pagesize, pageindex)
+		if err==nil{
+			controller.ApiDataList(c, "查询成功", models, count)
+		}else{			
+			controller.ApiErrorCode(c, "未查询到结果", models, global.NoResult)
+		}
 	} else {
 		var adminUserModel *adminModel.AdminUser
+		var err error
 		if adminUserService.IsPhone(queryID) {
-			adminUserModel = adminUserService.GetUserByPhone(queryID)
+			adminUserModel, err = adminUserService.GetUserByPhone(queryID)
 		} else if adminUserService.IsEmail(queryID) {
-			adminUserModel = adminUserService.GetUserByEmail(queryID)
+			adminUserModel,err = adminUserService.GetUserByEmail(queryID)
 		} else if adminUserService.IsUserName(queryID) {
-			adminUserModel = adminUserService.GetUserByUserName(queryID)
+			adminUserModel,err = adminUserService.GetUserByUserName(queryID)
 		}
-		if adminUserModel != nil {
+		if err == nil {
 			controller.ApiDataList(c, "查询成功", [...]*adminModel.AdminUser{adminUserModel}, 1)
 		} else {
 			controller.ApiSuccess(c, "查询成功", gin.H{
@@ -96,9 +99,7 @@ func (controller *UserController) getUserList(c *gin.Context) {
 *
 * @return
  */
-//  @RequestMapping(value = "getUsers", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = false)
-func (controller *UserController) getUsers(c *gin.Context) {
+func (controller *UserController) GetUsers(c *gin.Context) {
 	var uids []string
 	err := c.ShouldBind(&uids)
 	if err != nil {
@@ -115,9 +116,7 @@ func (controller *UserController) getUsers(c *gin.Context) {
 * @return
  */
 //  @ApiOperation("获取我的用户信息")
-//  @RequestMapping(value = "getme", method = RequestMethod.GET)
-//  @IAuthorization(needPermission =false)
-func (controller *UserController) getme(c *gin.Context) {
+func (controller *UserController) GetMe(c *gin.Context) {
 	// uid:=controller.GetContextUserId(c)
 	userEntity := controller.GetContextUserObj(c)
 	controller.ApiSuccess(c, "", userEntity)
@@ -130,9 +129,7 @@ func (controller *UserController) getme(c *gin.Context) {
 * @param request
 * @return
  */
-//  @RequestMapping(value = "addUserModel", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources = {"api:iotdata:account:user:addUserModel"})
-func (controller *UserController) addTConfigUserModel(c *gin.Context) {
+func (controller *UserController) AddUserModel(c *gin.Context) {
 	var model *adminModel.AdminUser
 	err := c.ShouldBind(&model)
 	if err != nil {
@@ -173,9 +170,7 @@ func (controller *UserController) addTConfigUserModel(c *gin.Context) {
 * @param request
 * @return
  */
-//  @RequestMapping(value = "modifyUserModel", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources = {"api:iotdata:account:user:modifyUserModel"})
-func (controller *UserController) modifyTConfigUserModel(c *gin.Context) {
+func (controller *UserController) ModifyUserModel(c *gin.Context) {
 	var model *adminModel.AdminUser
 	err := c.ShouldBind(&model)
 	if err != nil {
@@ -213,9 +208,7 @@ func (controller *UserController) modifyTConfigUserModel(c *gin.Context) {
 * @param request
 * @return
  */
-//  @RequestMapping(value = "changeUserStat", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources = {"api:iotdata:account:user:changeUserStat"})
-func (controller *UserController) changeUserStat(c *gin.Context) {
+func (controller *UserController) ChangeUserStat(c *gin.Context) {
 	uid := c.PostForm("uid")
 	id, err1 := strconv.Atoi(uid)
 	stat := c.PostForm("stat")
@@ -223,7 +216,7 @@ func (controller *UserController) changeUserStat(c *gin.Context) {
 	if err1 != nil || err2 != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
 	}
-	updateResult := adminUserService.UpdateUserState(id, uint8(state))
+	updateResult := adminUserService.UpdateUserState(id, state)
 	controller.ApiSuccess(c, "", updateResult)
 
 }
@@ -235,16 +228,14 @@ func (controller *UserController) changeUserStat(c *gin.Context) {
 * @param pwd
 * @return
  */
-//  @RequestMapping(value = "modifyPwd", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = false)
-func (controller *UserController) modifyPwd(c *gin.Context) {
+func (controller *UserController) ModifyPwd(c *gin.Context) {
 	// uid := c.PostForm("uid")
 	// id , err1 := strconv.Atoi(uid)
 	pwd := c.PostForm("pwd")
 	npwd := c.PostForm("npwd")
 	uid := controller.GetContextUserId(c)
-	userModel := adminUserService.GetUserByUserID(strconv.Itoa(uid))
-	if userModel == nil {
+	userModel, err := adminUserService.GetUserByUserID(strconv.Itoa(uid))
+	if err != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.VerifyFail)
 		return
 	}
@@ -266,9 +257,7 @@ func (controller *UserController) modifyPwd(c *gin.Context) {
 *
 * @return
  */
-//  @RequestMapping(value = "modifyUserPhoto", method = RequestMethod.POST)
-//  @IAuthorization(needPermission = false)
-func (controller *UserController) modifyUserPhoto(c *gin.Context) {
+func (controller *UserController) ModifyUserPhoto(c *gin.Context) {
 	file, _ := c.FormFile("file")
 	newFilePath, returnUrl := saveFile.GetSaveFilePath(file, global.AppConf.Upload)
 	err := c.SaveUploadedFile(file, newFilePath)
@@ -301,7 +290,7 @@ func (controller *UserController) modifyUserPhoto(c *gin.Context) {
  */
 //  @RequestMapping(value = "resetPwd", method = RequestMethod.POST)
 //  @IAuthorization(needPermission = true,resources = {"api:iotdata:account:user:resetPwd"})
-func (controller *UserController) resetPwd(c *gin.Context) {
+func (controller *UserController) ResetPwd(c *gin.Context) {
 	uid := c.PostForm("uid")
 	id, _ := strconv.Atoi(uid)
 	pwd := c.PostForm("pwd")

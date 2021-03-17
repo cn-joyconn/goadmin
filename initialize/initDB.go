@@ -33,7 +33,7 @@ func InitDB(initAdminUser bool) {
 	var err error
 	if global.DBConf.DBType == "mysql" {
 		dblink = global.DBConf.Mysql
-		dsn = fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=%s&parseTime=True&loc=Local", dblink.DBUser, dblink.DBPWD, dblink.DBHost, dblink.DBPort, dblink.DBName, dblink.DBCharset)
+		dsn = fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=%s&parseTime=true&loc=Local", dblink.DBUser, dblink.DBPWD, dblink.DBHost, dblink.DBPort, dblink.DBName, dblink.DBCharset)
 		driver = mysql.Open(dsn)
 	} else if global.DBConf.DBType == "postgres" {
 		dblink = global.DBConf.Postgres
@@ -58,6 +58,7 @@ func InitDB(initAdminUser bool) {
 		},
 		Logger: &middleware.GormLogger{
 			SlowThreshold: durationseconds,
+			// LogLevel:      gormlogger.Info,
 			LogLevel:      gormlogger.Info,
 		},
 	})

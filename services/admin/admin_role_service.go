@@ -80,10 +80,13 @@ func (service *AdminRoleService) SelectByPrimaryKey(pId int) *adminModel.AdminRo
 	var result *adminModel.AdminRole
 	err := roleCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		defaultOrm.DB.Where("PId = ?", pId).First(&result)
-		if result != nil {
-			roleCacheObj.Put(cacheKey, result, 1000*60*60*24)
+		var data adminModel.AdminRole
+		err:=defaultOrm.DB.Where("PId = ?", pId).First(&data).Error
+		if err == nil {
+			roleCacheObj.Put(cacheKey, &data, 1000*60*60*24)
+			result = &data
 		}
+
 	}
 
 	return result
@@ -132,15 +135,13 @@ func (service *AdminRoleService) SelectByRoleIds(pIds []int) []*adminModel.Admin
 		}
 
 		if notExisitPids != nil && len(notExisitPids) > 0 {
-			var roleObjs []*adminModel.AdminRole
-			defaultOrm.DB.Where("PId in (?)", notExisitPids).Find(&roleObjs)
-			if roleObjs != nil {
+			var roleObjs []adminModel.AdminRole
+			err =defaultOrm.DB.Where("PId in (?)", notExisitPids).Find(&roleObjs).Error
+			if err == nil {
 				for _, roleObj := range roleObjs {
-					if roleObj != nil {
-						cacheKey := service.getRoleCacheKey(roleObj.PId)
-						roleCacheObj.Put(cacheKey, roleObj, 1000*60*60*24)
-						result = append(result, roleObj)
-					}
+					cacheKey := service.getRoleCacheKey((&roleObj).PId)
+						roleCacheObj.Put(cacheKey, &roleObj, 1000*60*60*24)
+						result = append(result, &roleObj)
 
 				}
 
@@ -155,16 +156,18 @@ func (service *AdminRoleService) SelectByRoleIds(pIds []int) []*adminModel.Admin
 * @param creatUser 创建用户
 * @return  未找到时返回null
  */
-func (service *AdminRoleService) SelectByPage(creatUser string, pageIndex int, pageSize int) ([]*adminModel.AdminRole, int64) {
-	var result []*adminModel.AdminRole
-	var count int64
+func (service *AdminRoleService) SelectByPage(creatUser string, pageIndex int, pageSize int)(err error, list interface{}, total int64) {
+	var result []adminModel.AdminRole
 	db := defaultOrm.DB
 	if !strtool.IsBlank(creatUser) {
 		db = db.Where("PCreatuserid = ?", creatUser)
 	}
-	db.Model(&adminModel.AdminRole{}).Count(&count)
-	db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result)
-	return result, count
+	err=db.Model(&adminModel.AdminRole{}).Count(&total).Error
+	if err==nil{
+		err=db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+
+	}
+	return err,result, total
 }
 
 /**

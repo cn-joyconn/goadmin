@@ -10,7 +10,6 @@ import (
 
 	// handle "github.com/cn-joyconn/goadmin/handle"
 	initialize "github.com/cn-joyconn/goadmin/initialize"
-	// adminModel "github.com/cn-joyconn/goadmin/models/admin"
 	adminService "github.com/cn-joyconn/goadmin/services/admin"
 
 	// config "github.com/cn-joyconn/goadmin/utils/config"
@@ -42,19 +41,29 @@ func TestInitDB(t *testing.T) {
 }
 func TestQueryUser(t *testing.T) {
 	initialize.Init(func(e *gin.Engine) bool {
-		return true
+		return false
 	})
+	// model := new(adminModel.AdminUser)
+	// obj1, err := model.GetAdminUser("1", 1)
+	// logMsg1, _ := json.Marshal(obj1)
+	// gologs.GetLogger("test").Info(string(logMsg1))
+	// logMsg1, _ = json.Marshal(err)
+	// gologs.GetLogger("test").Info(string(logMsg1))
 	service := new(adminService.AdminUserService)
-	obj := service.GetUserByUserID("22")
+	obj, err := service.GetUserByUserID("5")
 	logMsg, _ := json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
-	obj = service.GetUserByUserName("superManage")
+	logMsg, _ = json.Marshal(err)
+	ii := err != nil
+	gologs.GetLogger("test").Info(string(err.Error()))
+	gologs.GetLogger("test").Info(strconv.FormatBool(ii))
+	obj, _ = service.GetUserByUserName("superManage")
 	logMsg, _ = json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
-	obj = service.GetUserByPhone("18333660110")
+	obj, _ = service.GetUserByPhone("18333660110")
 	logMsg, _ = json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
-	obj = service.GetUserByEmail("18333660110@189.cn")
+	obj, _ = service.GetUserByEmail("18333660110@189.cn")
 	logMsg, _ = json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
 
@@ -64,7 +73,7 @@ func TestUpdateUser(t *testing.T) {
 		return true
 	})
 	service := new(adminService.AdminUserService)
-	obj := service.GetUserByUserID("22")
+	obj, _ := service.GetUserByUserID("22")
 	logMsg, _ := json.Marshal(obj)
 	gologs.GetLogger("test").Info(string(logMsg))
 
@@ -74,7 +83,7 @@ func TestUpdateUser(t *testing.T) {
 	updateResult := service.UpdateUserPubInfo(obj)
 	gologs.GetLogger("test").Info(strconv.Itoa(updateResult))
 
-	obj = service.GetUserByUserID("22")
+	obj, _ = service.GetUserByUserID("22")
 	logMsg, err := json.Marshal(obj)
 	if err != nil {
 		gologs.GetLogger("test").Info(err.Error())
@@ -101,7 +110,7 @@ func TestLogin(t *testing.T) {
 		return true
 	})
 	service := new(adminService.AdminUserService)
-	userObj := service.GetAdminUser("22", 1)
+	userObj, _ := service.GetAdminUser("22", 1)
 	fmt.Println(userObj.Alias)
 }
 

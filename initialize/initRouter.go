@@ -22,13 +22,18 @@ func RegistorRouters(Router *gin.Engine) {
 	PublicGroup := contextRouter.Group("")
 	AuthGroup := contextRouter.Group("")
 	PermissioneGroup := contextRouter.Group("")
-	AuthGroup.Use(auth.Authorize())
+	AuthGroup.Use(auth.Authorize(global.AppConf.Authorize.LoginUrl))
 	PermissioneGroup.Use(auth.Permission())
 	JoyAuthorizeGroup := &auth.JoyAuthorizeGroup{GinGroup:AuthGroup}
 	JoyPermissionGroup := &auth.JoyPermissionGroup{GinGroup:PermissioneGroup}
 
 	routers.InitCommonRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
 	routers.InitAccountRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
+	routers.InitHomeRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
+	routers.InitAdminResourceRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
+	routers.InitAdminRoleRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
+	routers.InitAdminMenuRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
+	routers.InitAdminUserRouter(PublicGroup, JoyAuthorizeGroup, JoyPermissionGroup)
 
 	// {
 	// 	router.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权

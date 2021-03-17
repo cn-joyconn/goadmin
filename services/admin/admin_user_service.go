@@ -102,31 +102,35 @@ func (service *AdminUserService) IsPhone(phone string) bool {
 // searchID 查询ID
 // type     查询类型 1用户id 2手机号 3邮箱 4用户名
 // 返回 用户信息
-func (service *AdminUserService) GetAdminUser(searchID string, searchType int) *adminModel.AdminUser {
-	var result *adminModel.AdminUser
+func (service *AdminUserService) GetAdminUser(searchID string, searchType int) (*adminModel.AdminUser, error) {
+	// var result =new(adminModel.AdminUser)
+	var result adminModel.AdminUser
+	var err error
 	switch searchType {
 	case 1:
 		//userid
 		uid, _ := strconv.Atoi(searchID)
-		defaultOrm.DB.First(&result, uid)
+		// stmt := defaultOrm.DB.Model(&adminModel.AdminUser{}).Session(&gorm.Session{DryRun: true}).Find(&result, uid).Statement
+		// fmt.Println(stmt.SQL.String())
+		err = defaultOrm.DB.Model(&adminModel.AdminUser{}).First(&result, uid).Error
 		break
 	case 2:
 		//phone
-		defaultOrm.DB.Where("f_phone_md5 = ?", strtool.Md5(searchID)).First(&result)
+		err = defaultOrm.DB.Where("f_phone_md5 = ?", strtool.Md5(searchID)).First(&result).Error
 		break
 	case 3:
 		//email
-		defaultOrm.DB.Where("f_email_md5 = ?", strtool.Md5(searchID)).First(&result)
+		err = defaultOrm.DB.Where("f_email_md5 = ?", strtool.Md5(searchID)).First(&result).Error
 		break
 	case 4:
 		//username
-		defaultOrm.DB.Where("f_user_name_md5 = ?", strtool.Md5(searchID)).First(&result)
+		searchID = strtool.Md5(searchID)
+		err = defaultOrm.DB.Where("f_user_name_md5 = ?", searchID).First(&result).Error
 		break
 	default:
-		result = nil
-		break
+		return nil, err
 	}
-	return result
+	return &result, err
 }
 
 // 登录验证
@@ -174,9 +178,9 @@ func (service *AdminUserService) Login(loginID string, password string, loginTyp
 		// resultObject.setErrorMsg("密码错误");
 		return nil, global.LoginPassError
 	}
-	authenticationInfoModel := service.GetAdminUser(loginID, loginType)
+	authenticationInfoModel,err := service.GetAdminUser(loginID, loginType)
 
-	if authenticationInfoModel != nil {
+	if err == nil {
 		var pwd = password
 		if !isEncryptPwd {
 			pwd = service.GetSaltPwd(password)
@@ -256,7 +260,7 @@ func (service *AdminUserService) LoginByEmail(email string, password string) (*a
 * @param userID
 * @return
  */
-func (service *AdminUserService) GetUserByUserID(userID string) *adminModel.AdminUser {
+func (service *AdminUserService) GetUserByUserID(userID string) (*adminModel.AdminUser,error) {
 	return service.GetAdminUser(userID, 1)
 }
 
@@ -265,7 +269,7 @@ func (service *AdminUserService) GetUserByUserID(userID string) *adminModel.Admi
 * @param phone
 * @return
  */
-func (service *AdminUserService) GetUserByPhone(phone string) *adminModel.AdminUser {
+func (service *AdminUserService) GetUserByPhone(phone string) (*adminModel.AdminUser,error) {
 	return service.GetAdminUser(phone, 2)
 }
 
@@ -274,7 +278,7 @@ func (service *AdminUserService) GetUserByPhone(phone string) *adminModel.AdminU
 * @param userName
 * @return
  */
-func (service *AdminUserService) GetUserByUserName(userName string) *adminModel.AdminUser {
+func (service *AdminUserService) GetUserByUserName(userName string) (*adminModel.AdminUser,error) {
 	return service.GetAdminUser(userName, 4)
 }
 
@@ -283,7 +287,7 @@ func (service *AdminUserService) GetUserByUserName(userName string) *adminModel.
 * @param email
 * @return
  */
-func (service *AdminUserService) GetUserByEmail(email string) *adminModel.AdminUser {
+func (service *AdminUserService) GetUserByEmail(email string) (*adminModel.AdminUser,error) {
 	return service.GetAdminUser(email, 3)
 }
 
@@ -332,15 +336,13 @@ func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*admin
 		}
 
 		if notExisitIDs != nil && len(notExisitIDs) > 0 {
-			var userObjs []*adminModel.AdminUserBasic
-			defaultOrm.DB.Select("ID", "Alias", "Sex", "HeadPortrait", "CreatedAt", "UserCD").Find(&userObjs, notExisitIDs)
-			if userObjs != nil {
+			var userObjs []adminModel.AdminUserBasic
+			err:=defaultOrm.DB.Select("ID", "Alias", "Sex", "HeadPortrait", "CreatedAt", "UserCD").Find(&userObjs, notExisitIDs).Error
+			if err == nil {
 				for _, userObj := range userObjs {
-					if userObj != nil {
-						cacheKey := service.getUserCachekey(strconv.Itoa(userObj.ID))
-						userCacheObj.Put(cacheKey, userObj, 1000*60*60*24)
-						result = append(result, userObj)
-					}
+					cacheKey := service.getUserCachekey(strconv.Itoa((&userObj).ID))
+						userCacheObj.Put(cacheKey, &userObj, 1000*60*60*24)
+						result = append(result, &userObj)
 
 				}
 
@@ -355,12 +357,12 @@ func (service *AdminUserService) GetUserRolesByUid(uid string) []*adminModel.XAd
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
 		var adminUserModel adminModel.AdminUser
-		defaultOrm.DB.Where(" ID = ?", uid).First(&adminUserModel)
-		if adminUserModel.ID > 0 {
-			if strtool.IsBlank(adminUserModel.PRoles) {
+		err:=defaultOrm.DB.Where(" ID = ?", uid).First(&adminUserModel).Error
+		if err==nil {
+			if strtool.IsBlank((&adminUserModel).PRoles) {
 				result = make([]*adminModel.XAdminRoleLimit, 0)
 			} else {
-				err = json.Unmarshal([]byte(adminUserModel.PRoles), &result)
+				err = json.Unmarshal([]byte((&adminUserModel).PRoles), &result)
 				if err != nil {
 					result = make([]*adminModel.XAdminRoleLimit, 0)
 				}
@@ -378,12 +380,14 @@ func (service *AdminUserService) GetUserRolesByUid(uid string) []*adminModel.XAd
 * @param userIDs
 * @return
  */
-func (service *AdminUserService) SelectUserList(pageSize int, pageIndex int) ([]*adminModel.AdminUser, int64) {
-	var result []*adminModel.AdminUser
-	var count int64
-	defaultOrm.DB.Model(&adminModel.AdminUser{}).Count(&count)
-	defaultOrm.DB.Order("ID desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result)
-	return result, count
+func (service *AdminUserService) SelectUserList(pageSize int, pageIndex int) ( list interface{},count int64,err error) {
+	var result []adminModel.AdminUser
+	
+	err=defaultOrm.DB.Model(&adminModel.AdminUser{}).Count(&count).Error
+	if err==nil{		
+		err=defaultOrm.DB.Order("ID desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+	}
+	return result, count,err
 }
 
 //InsertUser 添加用户
@@ -393,7 +397,7 @@ func (service *AdminUserService) SelectUserList(pageSize int, pageIndex int) ([]
 //userEmail 登录邮箱 不填则为null
 //pwd 密码
 //state 状态
-func (service *AdminUserService) InsertUser(userID string, userName string, userPhone string, userEmail string, pwd string, state uint8) (int, *adminModel.AdminUser) {
+func (service *AdminUserService) InsertUser(userID string, userName string, userPhone string, userEmail string, pwd string, state int) (int, *adminModel.AdminUser) {
 	adminUser := &adminModel.AdminUser{}
 	// adminUser.ID=userObj.ID
 	adminUser.Alias = userName
@@ -489,7 +493,7 @@ func (service *AdminUserService) UpdateUserRoles(uid int, userRoles []*adminMode
 //UpdateState 修改一个用户的认证状态
 //  userID 用户ID
 //  state 状态
-func (service *AdminUserService) UpdateUserState(pUserID int, pState uint8) int64 {
+func (service *AdminUserService) UpdateUserState(pUserID int, pState int) int64 {
 	updateObj := &adminModel.AdminUser{}
 	updateObj.ID = pUserID
 	updateObj.Status = pState
@@ -613,10 +617,11 @@ func (service *AdminUserService) UpdateUserPassword(pUserID int, pPassword strin
 	}
 	return result.RowsAffected
 }
+
 //UpdateUserName 修改用户头像
 //  userID  用户ID
 //返回修改结果
-func (service *AdminUserService) UpdateUserHeadPortrait(pUserID int, HeadPortrait string) int64 {	
+func (service *AdminUserService) UpdateUserHeadPortrait(pUserID int, HeadPortrait string) int64 {
 	updateObj := &adminModel.AdminUser{}
 	updateObj.ID = pUserID
 	updateObj.HeadPortrait = HeadPortrait

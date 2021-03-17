@@ -1,41 +1,34 @@
 package controllers
 
-import (
-	// "beego_admin/logic"
-	// "beego_admin/models"
-	// "beego_admin/utils"
-	// "fmt"
-	// "github.com/astaxie/beego"
-	// "github.com/astaxie/beego/orm"
-	// "github.com/astaxie/beego/validation"
-	// "os"
-	// "runtime"
-	// "strconv"
-	// "time"
-)
+import "github.com/gin-gonic/gin"
+
+// "fmt"
+// "os"
+// "runtime"
+// "strconv"
+// "time"
 
 //后台首页管理
 type IndexController struct {
 	BaseController
 }
 
+func (controller *IndexController) Index(c *gin.Context) {
+	data := gin.H{
+		"pageTitle": "登录",
+	}
+	// username, err := c.Cookie(global.AppConf.Authorize.Cookie.LoginName)
+	// if err == nil {
+	// 	data["username"] = ""
+	// } else {
+	// 	data["username"] = username
+	// }
+	// data["joyconnVerifyCodeloginCodeenable"] = global.AppConf.Authorize.VerifyCode.Enable
+	// data["ranPath"] = time.Now().Unix()
 
-// func (c *IndexController) Index() {
-// 	c.Data["appname"] = beego.AppConfig.String("appname")
-// 	//查询用户的权限
-// 	ruleIds := logic.GetSessionAuth(c.Ctx)
-// 	var adminAuthRules []*models.AdminAuthRule
-// 	if ruleIds[0] != "*"{
-// 		adminAuthRules,_ = models.AdminAuthRuleGetMenu(ruleIds...)
-// 	}else{
-// 		adminAuthRules,_ = models.AdminAuthRuleGetMenu()
-// 	}
-// 	//组装成树形菜单
-// 	c.Data["treeMenus"] = logic.MakeRuleTree(adminAuthRules,0)
-
-// 	c.Data["adminUser"] = c.GetSession("admin_user")
-// 	c.TplName = "index/index.html"
-// }
+	controller.ResponseHtml(c, "index/index.html", data)
+	//c.Abort()
+}
 
 // func (c *IndexController) Login() {
 
@@ -171,4 +164,3 @@ type IndexController struct {
 // 	c.Data["adminUser"] = adminUser
 // 	c.SetTpl("index/person.html")
 // }
-

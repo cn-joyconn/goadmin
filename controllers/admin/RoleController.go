@@ -37,9 +37,7 @@ func (controller *RoleController) ManagePage(c *gin.Context) {
  * @param
  * @return
  */
-//  @RequestMapping(value = "updateState", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:updateState"})
-func (controller *RoleController) deletetRoleByPrimaryKey(c *gin.Context) {
+func (controller *RoleController) UpdateState(c *gin.Context) {
 	// Integer Id, Integer state
 	fId := c.PostForm("Id")
 	id, err1 := strconv.Atoi(fId)
@@ -67,9 +65,7 @@ func (controller *RoleController) deletetRoleByPrimaryKey(c *gin.Context) {
  * @param record
  * @return
  */
-//  @RequestMapping(value = "insert", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:insert"})
-func (controller *RoleController) insertRole(c *gin.Context) {
+func (controller *RoleController) InsertRole(c *gin.Context) {
 	var record adminModel.AdminRole
 	c.ShouldBind(&record)
 	PDesc, err1 := url.QueryUnescape(record.PDesc)
@@ -95,9 +91,7 @@ func (controller *RoleController) insertRole(c *gin.Context) {
  * @param record
  * @return
  */
-//  @RequestMapping(value = "update", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:update"})
-func (controller *RoleController) updatetRoleByPrimaryKey(c *gin.Context) {
+func (controller *RoleController) UpdatetRoleByPrimaryKey(c *gin.Context) {
 	var record adminModel.AdminRole
 	c.ShouldBind(&record)
 	PDesc, err1 := url.QueryUnescape(record.PDesc)
@@ -122,9 +116,7 @@ func (controller *RoleController) updatetRoleByPrimaryKey(c *gin.Context) {
  * @param fId
  * @return
  */
-//  @RequestMapping(value = "get", method= RequestMethod.GET)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:get"})
-func (controller *RoleController) selectRoleByPrimaryKey(c *gin.Context) {
+func (controller *RoleController) SelectRoleByPrimaryKey(c *gin.Context) {
 	//Integer fId
 	fId := c.PostForm("fId")
 	id, err1 := strconv.Atoi(fId)
@@ -148,9 +140,7 @@ func (controller *RoleController) selectRoleByPrimaryKey(c *gin.Context) {
  * @param pageSize
  * @return
  */
-//  @RequestMapping(value = "getpage", method= RequestMethod.GET)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:getpage"})
-func (controller *RoleController) selectRoleListByPage(c *gin.Context) {
+func (controller *RoleController) SelectRoleListByPage(c *gin.Context) {
 	pageIndex := c.DefaultQuery("pageIndex", "1")
 	pageSize := c.DefaultQuery("pageSize", "10")
 	pageindex, err1 := strconv.Atoi(pageIndex)
@@ -168,8 +158,13 @@ func (controller *RoleController) selectRoleListByPage(c *gin.Context) {
 	if global.IsSuperAdmin(uid) {
 		creatUser = ""
 	}
-	models, count := adminRoleService.SelectByPage(creatUser, pageindex, pagesize)
-	controller.ApiDataList(c, "查询成功", models, count)
+	err, models, count := adminRoleService.SelectByPage(creatUser, pageindex, pagesize)
+	if err == nil {
+		controller.ApiDataList(c, "查询成功", models, count)
+
+	} else {
+		controller.ApiErrorCode(c, "查询成功", models, global.NoResult)
+	}
 }
 
 /**
@@ -178,9 +173,7 @@ func (controller *RoleController) selectRoleListByPage(c *gin.Context) {
  * @param roleid
  * @return
  */
-//  @RequestMapping(value = "getResourceIDsByRoleID", method= RequestMethod.GET)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:getResourceIDsByRoleID"})
-func (controller *RoleController) getResourceIDsByRoleID(c *gin.Context) {
+func (controller *RoleController) GetResourceIDsByRoleID(c *gin.Context) {
 	//int roleid
 	fId := c.PostForm("roleid")
 	id, err1 := strconv.Atoi(fId)
@@ -202,9 +195,7 @@ func (controller *RoleController) getResourceIDsByRoleID(c *gin.Context) {
  *
  * @return
  */
-//  @RequestMapping(value = "insertRoleResource", method= RequestMethod.POST)
-//  @IAuthorization(needPermission = true,resources={"api:system:authorize:role:insertRoleResource"})
-func (controller *RoleController) updateRoleResource(c *gin.Context) {
+func (controller *RoleController) UpdateRoleResource(c *gin.Context) {
 	//Integer roleid,int appid,@RequestParam(value = "resourceids[]") int[] resourceids) {
 	fId := c.PostForm("roleid")
 	roleid, err1 := strconv.Atoi(fId)

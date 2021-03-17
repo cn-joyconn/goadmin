@@ -1,8 +1,11 @@
 package loginToken
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"time"
+
+	// "encoding/hex"
 
 	"github.com/cn-joyconn/goutils/encrypt"
 	"github.com/cn-joyconn/goutils/strtool"
@@ -26,12 +29,16 @@ func ParseLoginTokenID(tokenStr string, token_ekey string) *LoginTokenID {
 		return nil
 	}
 	//解析令牌
-	bytes := encrypt.AesDecryptECB([]byte(tokenStr), []byte(token_ekey))
+	x4, err := base64.StdEncoding.DecodeString(tokenStr)
+	if err != nil {
+		return nil
+	}
+	bytes := encrypt.AesDecryptCBC(x4, []byte(token_ekey))
 	if len(bytes) == 0 {
 		return nil
 	}
 	var loginTokenID *LoginTokenID
-	err := json.Unmarshal(bytes, &loginTokenID)
+	err = json.Unmarshal(bytes, &loginTokenID)
 	if err != nil {
 		return nil
 	}
@@ -45,8 +52,8 @@ func ParseLoginTokenID(tokenStr string, token_ekey string) *LoginTokenID {
 * @param password 密码
 * Created by Eric.Zhang on 2016/12/29.
  */
-func CreateLoginTokenID(sign string,userid string, password string, token_ekey string) *LoginTokenID {
-	
+func CreateLoginTokenID(sign string, userid string, password string, token_ekey string) *LoginTokenID {
+
 	loginTokenID := &LoginTokenID{
 		Uid:       userid,
 		Pwd:       password,
@@ -63,8 +70,8 @@ func (l *LoginTokenID) toString() string {
 		return ""
 	}
 
-	bytes = encrypt.AesEncryptECB(bytes, []byte(l.AesKey))
+	bytes = encrypt.AesEncryptCBC(bytes, []byte(l.AesKey))
 
-	return string(bytes)
-
+	// return string(bytes)
+	return base64.StdEncoding.EncodeToString(bytes)
 }

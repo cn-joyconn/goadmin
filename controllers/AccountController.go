@@ -12,7 +12,6 @@ import (
 	"github.com/cn-joyconn/goadmin/models/global"
 	adminServices "github.com/cn-joyconn/goadmin/services/admin"
 	"github.com/cn-joyconn/goadmin/utils/joyCaptcha"
-	"github.com/cn-joyconn/goadmin/utils/loginToken"
 	"github.com/cn-joyconn/goutils/strtool"
 	"github.com/gin-gonic/gin"
 )
@@ -80,7 +79,7 @@ func (controller *AccountController) loginApi(c *gin.Context, byCookie bool) {
 			return
 		}
 	}
-	loginID := c.PostForm("phone")
+	loginID := c.PostForm("loginID")
 	pwd := c.PostForm("pwd")
 	adminUserService := &adminServices.AdminUserService{}
 	var adminUserModel *adminModel.AdminUser
@@ -96,8 +95,8 @@ func (controller *AccountController) loginApi(c *gin.Context, byCookie bool) {
 		return
 	}
 	if code == global.LoginSucess {
-		tokenHelper := &loginToken.TokenHelper{}
-		tokenHelper.SetAuthenticationToken(strconv.Itoa(adminUserModel.ID), adminUserModel.Password, c, byCookie)
+		// tokenHelper := &loginToken.TokenHelper{}
+		global.TokenHelper.SetAuthenticationToken(strconv.Itoa(adminUserModel.ID), adminUserModel.Password, c, byCookie)
 		controller.ApiSuccess(c, "登录成功", adminUserModel)
 
 	} else {

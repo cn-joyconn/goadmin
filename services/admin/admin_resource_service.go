@@ -130,15 +130,13 @@ func (service *AdminResourceService) SelectByPrimaryKeys(pIds []int) []*adminMod
 		}
 
 		if notExisitIDs != nil && len(notExisitIDs) > 0 {
-			var resourceObjs []*adminModel.AdminResource
-			defaultOrm.DB.Find(&resourceObjs, notExisitIDs)
-			if resourceObjs != nil {
+			var resourceObjs []adminModel.AdminResource
+			err:=defaultOrm.DB.Find(&resourceObjs, notExisitIDs).Error
+			if err == nil {
 				for _, resourceObj := range resourceObjs {
-					if resourceObj != nil {
-						cacheKey := service.getResourcesIDCacheKey(resourceObj.PId)
-						resouceCacheObj.Put(cacheKey, resourceObj, 1000*60*60*24)
-						result = append(result, resourceObj)
-					}
+					cacheKey := service.getResourcesIDCacheKey((&resourceObj).PId)
+						resouceCacheObj.Put(cacheKey, &resourceObj, 1000*60*60*24)
+						result = append(result, &resourceObj)
 
 				}
 
