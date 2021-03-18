@@ -27,7 +27,7 @@ func (controller *ResourceController) ManagePage(c *gin.Context) {
 		"pageTitle": "菜单管理",
 	}
 
-	controller.ResponseHtml(c, "authorize/Resource", data)
+	controller.ResponseHtml(c, "admin/Resource.html", data)
 }
 
 /**

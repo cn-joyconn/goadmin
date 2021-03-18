@@ -28,7 +28,7 @@ func (controller *RoleController) ManagePage(c *gin.Context) {
 		"pageTitle": "菜单管理",
 	}
 
-	controller.ResponseHtml(c, "authorize/role", data)
+	controller.ResponseHtml(c, "admin/role.html", data)
 }
 
 /**

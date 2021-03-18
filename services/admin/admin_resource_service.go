@@ -56,7 +56,7 @@ func (service *AdminResourceService) DeleteByPrimaryKey(pId int) int64 {
 	if obj == nil {
 		return -1
 	}
-	result := defaultOrm.DB.Where("PId = ?", pId).Delete(&obj)
+	result := defaultOrm.DB.Where("f_id = ?", pId).Delete(&obj)
 	if result.Error != nil {
 		gologs.GetLogger("orm").Error(result.Error.Error())
 		return 0
@@ -158,7 +158,7 @@ func (service *AdminResourceService) SelectByPrimaryKey(pId int) *adminModel.Adm
 	var result *adminModel.AdminResource
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		defaultOrm.DB.Where("PId = ?", pId).First(&result)
+		defaultOrm.DB.Where("f_id = ?", pId).First(&result)
 		if result != nil {
 			resouceCacheObj.Put(cacheKey, result, 1000*60*60*24)
 		}
@@ -178,7 +178,7 @@ func (service *AdminResourceService) SelectBypPermission(pPermission string) *ad
 	var result *adminModel.AdminResource
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		defaultOrm.DB.Where("PPermission = ?", pPermission).First(&result)
+		defaultOrm.DB.Where("f_permission = ?", pPermission).First(&result)
 		if result != nil {
 			resouceCacheObj.Put(cacheKey, result, 1000*60*60*24)
 		}
@@ -231,7 +231,7 @@ func (service *AdminResourceService) SelectBypPermissions(pPermissions []string)
 
 		if notExisitPermissions != nil && len(notExisitPermissions) > 0 {
 			var resourceObjs []*adminModel.AdminResource
-			defaultOrm.DB.Where("PPermission in (?)", notExisitPermissions).Find(&resourceObjs)
+			defaultOrm.DB.Where("f_permission in (?)", notExisitPermissions).Find(&resourceObjs)
 			if resourceObjs != nil {
 				for _, resourceObj := range resourceObjs {
 					if resourceObj != nil {

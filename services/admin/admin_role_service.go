@@ -81,7 +81,7 @@ func (service *AdminRoleService) SelectByPrimaryKey(pId int) *adminModel.AdminRo
 	err := roleCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
 		var data adminModel.AdminRole
-		err:=defaultOrm.DB.Where("PId = ?", pId).First(&data).Error
+		err:=defaultOrm.DB.Where("f_id = ?", pId).First(&data).Error
 		if err == nil {
 			roleCacheObj.Put(cacheKey, &data, 1000*60*60*24)
 			result = &data
@@ -136,7 +136,7 @@ func (service *AdminRoleService) SelectByRoleIds(pIds []int) *[]*adminModel.Admi
 
 		if notExisitPids != nil && len(notExisitPids) > 0 {
 			var roleObjs []adminModel.AdminRole
-			err =defaultOrm.DB.Where("PId in (?)", notExisitPids).Find(&roleObjs).Error
+			err =defaultOrm.DB.Where("f_id in (?)", notExisitPids).Find(&roleObjs).Error
 			if err == nil {
 				for _, roleObj := range roleObjs {
 					cacheKey := service.getRoleCacheKey((&roleObj).PId)
@@ -160,11 +160,11 @@ func (service *AdminRoleService) SelectByPage(creatUser string, pageIndex int, p
 	var result []adminModel.AdminRole
 	db := defaultOrm.DB
 	if !strtool.IsBlank(creatUser) {
-		db = db.Where("PCreatuserid = ?", creatUser)
+		db = db.Where("f_creat_user_id = ?", creatUser)
 	}
 	err=db.Model(&adminModel.AdminRole{}).Count(&total).Error
 	if err==nil{
-		err=db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+		err=db.Order("f_id desc").Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&result).Error
 
 	}
 	return err,result, total
@@ -193,7 +193,7 @@ func (service *AdminRoleService) UpdateByPrimaryKey(record *adminModel.AdminRole
 * @return 结果 1:成功 小于1:失败
  */
 func (service *AdminRoleService) UpdateStateByPrimaryKey(id int, state int) int64 {
-	result := defaultOrm.DB.Model(&adminModel.AdminRole{}).Where("PId = ?", id).Update("PState", state)
+	result := defaultOrm.DB.Model(&adminModel.AdminRole{}).Where("f_id = ?", id).Update("PState", state)
 	if result.Error != nil {
 		gologs.GetLogger("orm").Error(result.Error.Error())
 		return 0

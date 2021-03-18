@@ -20,7 +20,7 @@ type PermissionInfo struct {
 }
 
 var PermissionGroup = &JoyPermissionGroup{}
-var permissionMap = make(map[string][]*PermissionInfo, 0)
+var permissionMap = make(map[string]*[]PermissionInfo, 0)
 
 // var funcMap = make(map[gin.HandlerFunc][]string)
 func Permission() gin.HandlerFunc {
@@ -32,10 +32,8 @@ func Permission() gin.HandlerFunc {
 		// isAjax :=false
 		if exist {
 			permissions :=  make([]string,0)
-			for _,permissionInfo:=range permissionInfos{
-				if permissionInfo!=nil{
-					permissions = append(permissions, permissionInfo.Permission)
-				}
+			for _,permissionInfo:=range *permissionInfos{
+				permissions = append(permissions, permissionInfo.Permission)
 			}
 			permissions = array.RemoveDuplicateStr(permissions)
 			validationResultModel := getAuthPass(c, permissions, true)
@@ -53,23 +51,24 @@ func Permission() gin.HandlerFunc {
 }
 func (group *JoyPermissionGroup) registerHandlerPermission(relativePath string, permission string, handlers ...gin.HandlerFunc) {
 	name := ""
-	exsit := false
-	var permissions []*PermissionInfo
+	var permissions []PermissionInfo
 	for _, h := range handlers {
 		name = runtime.FuncForPC(reflect.ValueOf(h).Pointer()).Name()
-		permissions, exsit = permissionMap[name]
+		permissionValue, exsit := permissionMap[name]
 		if !exsit {
-			permissions = make([]*PermissionInfo, 0)
+			permissions = make([]PermissionInfo, 0)
+		}else{
+			permissions = *permissionValue
 		}
-		permissions = append(permissions, &PermissionInfo{Permission: permission, Url: joinPaths(group.GinGroup.BasePath(), relativePath)})
-		permissionMap[name] = permissions
+		permissions = append(permissions, PermissionInfo{Permission: permission, Url: joinPaths(group.GinGroup.BasePath(), relativePath)})
+		permissionMap[name] = &permissions
 	}
 }
 
-func (group *JoyPermissionGroup) GetAllPermissionName() []*PermissionInfo {
-	result := make([]*PermissionInfo, 0)
+func (group *JoyPermissionGroup) GetAllPermissionName() []PermissionInfo {
+	result := make([]PermissionInfo, 0)
 	for _, perpermissions := range permissionMap {
-		for _, p := range perpermissions {
+		for _, p := range *perpermissions {
 			result = append(result, p)
 		}
 	}

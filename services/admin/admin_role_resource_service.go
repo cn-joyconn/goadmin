@@ -41,9 +41,9 @@ func (service *AdminRoleResourceService) removeRoleResourceIDsCache(roleid int) 
  */
 func (service *AdminRoleResourceService) DeleteByPrimaryKey(roleid int, resourceids []int) int64 {
 
-	db := defaultOrm.DB.Where("PRoleid = ?", roleid)
+	db := defaultOrm.DB.Where("f_role_id = ?", roleid)
 	if resourceids != nil && len(resourceids) > 0 {
-		db = db.Where("PResource IN ?", resourceids)
+		db = db.Where("f_resource_id IN ?", resourceids)
 	}
 
 	result := db.Delete(&adminModel.AdminRoleResource{})
@@ -65,9 +65,9 @@ func (service *AdminRoleResourceService) DeleteByPrimaryKey(roleid int, resource
  */
 func (service *AdminRoleResourceService) DeleteByResourceID(pResource int) int64 {
 	var models []*adminModel.AdminRoleResource
-	defaultOrm.DB.Where("PResource = ?", pResource).Find(&models)
+	defaultOrm.DB.Where("f_resource_id = ?", pResource).Find(&models)
 	if models != nil && len(models) > 0 {
-		result := defaultOrm.DB.Where("PResource = ?", pResource).Delete(&adminModel.AdminRoleResource{})
+		result := defaultOrm.DB.Where("f_resource_id = ?", pResource).Delete(&adminModel.AdminRoleResource{})
 		if result.RowsAffected > 0 {
 			for _, model := range models {
 				service.removeRoleResourceIDsCache(int(model.PRoleid))
@@ -111,7 +111,7 @@ func (service *AdminRoleResourceService) Inserts(roleid int, resourceids []int) 
  */
 func (service *AdminRoleResourceService) SelectByPrimaryKey(pId int) *adminModel.AdminRoleResource {
 	var result adminModel.AdminRoleResource
-	err:=defaultOrm.DB.Where("PId = ?", pId).Find(&result).Error
+	err:=defaultOrm.DB.Where("f_id = ?", pId).Find(&result).Error
 	if err==nil{
 		return &result
 	}else{
@@ -130,7 +130,7 @@ func (service *AdminRoleResourceService) SelectByRoleID(roleid int) *[]int {
 	err := resouceCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
 		var models []adminModel.AdminRoleResource
-		err:=defaultOrm.DB.Where("PRoleid = ?", roleid).Find(&models).Error
+		err:=defaultOrm.DB.Where("f_role_id = ?", roleid).Find(&models).Error
 		if err == nil {
 			for _, model := range models {
 				result = append(result, (&model).PResource)
@@ -179,7 +179,7 @@ func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) *[]*admi
 
 		if notExisitIDs != nil && len(notExisitIDs) > 0 {
 			var models []adminModel.AdminRoleResource
-			err=defaultOrm.DB.Where("PRoleid in (?)", notExisitIDs).Find(&models).Error
+			err=defaultOrm.DB.Where("f_role_id in (?)", notExisitIDs).Find(&models).Error
 			if err == nil {
 				for _, model := range models {
 					cacheKey := service.getRoleResourcesCacheKey(int((&model).PRoleid))
@@ -203,7 +203,7 @@ func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) *[]*admi
 func (service *AdminRoleResourceService) selectByResourceID(pResource int) *[]int {
 	var models []adminModel.AdminRoleResource
 	var result = make([]int, 0)
-	err:=defaultOrm.DB.Where("PResource = ?", pResource).Find(&models).Error
+	err:=defaultOrm.DB.Where("f_resource_id = ?", pResource).Find(&models).Error
 	if err == nil {
 		for _, model := range models {
 			result = append(result, (&model).PRoleid)

@@ -79,7 +79,7 @@ func (service *AdminMenuService) Insert(record *adminModel.AdminMenu) int {
  */
 func (service *AdminMenuService) SelectMenuByID(pId int) (error, *adminModel.AdminMenu) {
 	var result adminModel.AdminMenu
-	err := defaultOrm.DB.Where("PId = ?", pId).First(&result).Error
+	err := defaultOrm.DB.Where("f_id = ?", pId).First(&result).Error
 	return err, &result
 }
 
@@ -111,12 +111,12 @@ func (service *AdminMenuService) SelectMenuByMenuID(menuId int) *[]adminModel.Ad
 func (service *AdminMenuService) SelectRootByPage(creatUser string, pageIndex int, pageSize int) (err error, list interface{}, total int64) {
 	var result []adminModel.AdminMenu
 	db := defaultOrm.DB.Where("f_menu_id = ?", 0)
-	if !strtool.IsBlank(creatUser) {
+	if !strtool.IsBlank(creatUser) || creatUser != "0" {
 		db = db.Where("f_creat_user_id = ?", creatUser)
 	}
 	err = db.Model(&adminModel.AdminMenu{}).Count(&total).Error
 	if err == nil {
-		err = db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+		err = db.Order("f_id desc").Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&result).Error
 	}
 	return err, result, total
 }

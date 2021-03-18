@@ -109,3 +109,18 @@
   /* border-left-color: #3c8dbc; */
 }
 /**joyconn-collapse**/
+
+
+.form-horizontal .form-inline .form-control.control-block{
+  width: 100%!important;
+}
+body.iframe-mode{
+  font-size: 14px;
+}
+.iframe-mode .container-fluid{
+  padding-top: 7.5px;
+  padding-bottom: 7.5px;
+}
+.iframe-mode .form-inline.row{
+  padding-bottom: 7px;
+}

@@ -386,7 +386,7 @@ func (service *AdminUserService) SelectUserList(pageSize int, pageIndex int) ( l
 	
 	err=defaultOrm.DB.Model(&adminModel.AdminUser{}).Count(&count).Error
 	if err==nil{		
-		err=defaultOrm.DB.Order("ID desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+		err=defaultOrm.DB.Order("ID desc").Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&result).Error
 	}
 	return result, count,err
 }

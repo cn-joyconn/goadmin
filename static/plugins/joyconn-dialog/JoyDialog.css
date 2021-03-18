@@ -9,7 +9,7 @@
   z-index: 10001;
   width: 100%;
   height: 100%;
-  font-size: .75rem;
+  /* font-size: .75rem; */
 }
 
 .JoyDialog .dialog-overlay {
@@ -27,7 +27,7 @@
   top: 50%;
   left: 50%;
   z-index: 10003;
-  width: 90%;
+  width: 100%;
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
       transform: translate(-50%, -50%);
@@ -35,7 +35,7 @@
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: .5rem;
 }
-.JoyDialog .dialog-content * {
+/* .JoyDialog .dialog-content * {
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
   margin: 0;
@@ -46,7 +46,7 @@
   -webkit-tap-highlight-color: transparent;
   font-family: Helvetica;
   font-size: 1rem;
-}
+} */
 
 .JoyDialog .dialog-btn, .dialog-btn-hl {
   position: relative;
@@ -221,8 +221,8 @@
 }
 
 .JoyDialog.dialog-open .dialog-content {
-  -webkit-animation-name: zoom-in;
-  animation-name: zoom-in;
+  /* -webkit-animation-name: zoom-in;
+  animation-name: zoom-in; */
 }
 .JoyDialog.dialog-open .dialog-overlay {
   -webkit-animation-name: fade-in;
@@ -749,52 +749,4 @@
   50%{-webkit-transform:rotate(180deg);}
   75%{-webkit-transform:rotate(270deg);}
   100%{-webkit-transform:rotate(360deg);} 
-}@font-face {font-family: "JDialog-icon";
-  src: url(./iconfont/iconfont.eot); /* IE9 */
-  src: url(./iconfont/iconfont.eot#iefix) format('embedded-opentype'), 
-  url('data:application/x-font-woff2;charset=utf-8;base64,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') format('woff2'),
-  url(./iconfont/iconfont.woff) format('woff'),
-  url(./iconfont/iconfont.ttf) format('truetype'), 
-  url(./iconfont/iconfont.svg#JDialog-icon) format('svg'); /* iOS 4.1- */
 }
-
-.JDialog-icon {
-  font-family: "JDialog-icon" !important;
-  font-size: 16px;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.icon-loading:before {
-  content: "\e688";
-}
-
-.icon-question:before {
-  content: "\e61f";
-}
-
-.icon-windcontrol:before {
-  content: "\e634";
-}
-
-.icon-info:before {
-  content: "\e65b";
-}
-
-.icon-busy_toast:before {
-  content: "\e632";
-}
-
-.icon-alert_toast:before {
-  content: "\e633";
-}
-
-.icon-failure_toast:before {
-  content: "\e636";
-}
-
-.icon-success_toast:before {
-  content: "\e63a";
-}
-

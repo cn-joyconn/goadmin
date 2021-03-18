@@ -29,7 +29,7 @@ func (controller *UserController) ManagePage(c *gin.Context) {
 		"pageTitle": "菜单管理",
 	}
 
-	controller.ResponseHtml(c, "authorize/userList", data)
+	controller.ResponseHtml(c, "admin/user.html", data)
 }
 func (controller *UserController) ModifyphotoPage(c *gin.Context) {
 	// fmt.Printf(c.HandlerName())

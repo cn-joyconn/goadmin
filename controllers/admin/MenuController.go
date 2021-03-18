@@ -27,9 +27,10 @@ func (controller *MenuController) ManagePage(c *gin.Context) {
 	data := gin.H{
 		"pageTitle": "菜单管理",
 	}
-	
-	controller.ResponseHtml(c, "authorize/menu", data)
+
+	controller.ResponseHtml(c, "admin/menu.html", data)
 }
+
 /**
  * 修改菜单状态菜单
  *
@@ -178,7 +179,7 @@ func (controller *MenuController) UpdatetMenuByPrimaryKey(c *gin.Context) {
  */
 func (controller *MenuController) GetMenu(c *gin.Context) {
 	//Integer menuID, HttpServletRequest request
-	fId := c.PostForm("menuID")
+	fId := c.Query("menuID")
 	menuID, err1 := strconv.Atoi(fId)
 	if err1 != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
@@ -190,6 +191,39 @@ func (controller *MenuController) GetMenu(c *gin.Context) {
 		controller.ApiSuccess(c, "", result)
 	} else {
 		controller.ApiError(c, "", result)
+	}
+
+}
+
+/**
+ * 查询菜单列表
+ *
+ * @param menuID
+ * @return
+ */
+func (controller *MenuController) GetRootByPage(c *gin.Context) {
+	//Integer menuID, HttpServletRequest request
+	fId := c.Query("pageIndex")
+	pageIndex, err1 := strconv.Atoi(fId)
+	if err1 != nil {
+		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
+		return
+	}
+	fId = c.Query("pageSize")
+	pageSize, err2 := strconv.Atoi(fId)
+	if err2 != nil {
+		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
+		return
+	}
+	userID := controller.GetContextUserId(c)
+	if global.IsSuperAdmin(userID){
+		userID = 0
+	}
+	err, result, count := MenuService.SelectRootByPage(strconv.Itoa(userID), pageIndex, pageSize)
+	if err == nil {
+		controller.ApiDataList(c, "", result, count)
+	} else {
+		controller.ApiErrorCode(c, "", result, global.NoResult)
 	}
 
 }

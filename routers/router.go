@@ -105,4 +105,5 @@ func InitAdminMenuRouter(publicGroup *gin.RouterGroup, authGroup *auth.JoyAuthor
 	permissioneGroup.POST("/api/system/authorize/menu/add", "api:system:authorize:menu:add", controller.InsertMenu)
 	permissioneGroup.POST("/api/system/authorize/menu/update", "api:system:authorize:menu:update", controller.UpdatetMenuByPrimaryKey)
 	permissioneGroup.GET("/api/system/authorize/menu/getMenu", "api:system:authorize:menu:getMenu", controller.GetMenu)
+	permissioneGroup.GET("/api/system/authorize/menu/getRootByPage", "api:system:authorize:menu:getRootByPage", controller.GetRootByPage)
 }

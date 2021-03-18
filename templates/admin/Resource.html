@@ -4,17 +4,568 @@
 
 <head>
   {{template "layout/head.html" .}}
-
+  <link href="${contentPath}/plugins/ztree_v3/css/metroStyle/metroStyle.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="${contentPath}/plugins/bootstrap-select/bootstrap-select.css">
+  <style type="text/css">
+  
+      .btn-white{
+          background-color:#fff!important;
+      }
+      .bootstrap-select .dropdown-menu{width:90%;}
+  </style>
 </head>
 
 <body>
-  <div class="wrapper">
-  </div>
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="row " style="margin-left: 0px;">
+                            <div class="form-horizontal searchPanel  form-inline"  >
+                                <label class=" control-label" style="padding-left:0px; ">应用:</label>
+                                <div class="btn-group" style="padding-left: 0px;">
+                                    <select data-name="appid" class="form-control  feild-edit appidSelect" style="width: 150px;"
+                                         onchange="resource_operat.AppIdchange($(this).val())">
+                                    </select>
+                                </div>
+                            </div>
+          
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- left column -->
+                    <div class="col-md-6">
+                        <div>
+                            <span style="margin-right:20px">颜色含义：</span>
+                            <span style="color: red!important;margin-right:20px">分类</span>
+                            <span style="color: blue!important;margin-right:20px">页面</span>
+                            <span style="color:green!important;margin-right:20px">页面内功能</span>
+                        </div>
+                        <div id="RightTreePannel" class=" ztree"></div>
+                    </div>
+                    <!-- right column -->
+                    <div class="col-md-6">
+                        <div class="box box-info" id="RightEditPannel" style="min-height: 400px;">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"><span class="text-green" id="cur_node_path"></span></h3>
+                            </div>
+                            <form class="form-horizontal">
+                                <div class="box-body">
+                                    <div class="form-inline row" style="display: none;">
+                                        <label class="col-sm-2 control-label"  for="rightid">权限id：</label>
+                                        <input  id="rightid" value="0" class="form-control  col-sm-10" type="text"  disabled="disabled"/>
+                                    </div>
+                                    <div class="form-inline row" style="display: none;">
+                                        <label class="col-sm-2 control-label">父节点ID：</label>
+                                        <input id="rightparentid" value="0" class="form-control  col-sm-10" type="text"   disabled="disabled"/>
+                                    </div>
+                                    <!--<div class="form-inline"><label  class="col-sm-2 control-label">权限级别：</label><input id="rightLvL" value="0" class="form-control  col-sm-10" type="text" disabled="disabled" /></div>-->
+                                    <div class="form-inline row">
+                                        <label class="col-sm-2 control-label" for="rightname">权限名称：</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="rightname" class="form-control  control-block"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline row"><label class="col-sm-2 control-label">权限：</label>
+                                        <div class="col-sm-10">
+                                            <select id="rightUrl" class="form-control selectpicker  control-block" ></select>
+                                            <label> 控制器中定义的权限标识，如：@IAuthorization(resources={"system:authorize:resource:get"}),则填写“system:authorize:resource:get”</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline row">
+                                        <label class="col-sm-2 control-label">描述：</label>
+                                        <div class="col-sm-10"><textarea id="nodeDescribe" class="form-control  control-block wysihtml5" rows="5"></textarea></div>
+                                    </div>
+                                    <div class="form-inline row">
+                                        <label class="col-sm-2 control-label" for="rightname">排序：</label>
+                                        <div class="col-sm-10">
+                                            <input type="number" id="sortid" class="form-control  control-block "/>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline row">
+                                        <label class="col-sm-2 control-label">类型：</label>
+                                        <div class="col-sm-10">
+                                            <select id="nodeMenu" class="form-control  control-block">
+                                            <option value="0" selected="selected">页面内功能</option>
+                                            <option value="1">页面</option>
+                                            <option value="2">分类</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <!--<div class="form-inline" ><label  class="col-sm-2 control-label">所属模块：</label><select id="nodeCategory"></select></div>-->
+          
+          
+                                    <div class="form-inline" id="FuncNode_errorNote" style="display: none;">
+                                        <span class="text-red">Text red to emphasize danger</span>
+                                    </div>
+          
+                                    <div style="text-align: right;">
+                                        <input type="button" id="RightEditPannel_addbtn" value="添加" style="display:none"
+                                               class="btn bg-olive btn-flat "/>
+                                        <input type="button" id="RightEditPannel_editbtn" value="修改" style="display:none"
+                                               class="btn bg-olive btn-flat "/>
+                                    </div>
+                                </div>
+          
+                            </form>
+                        </div>
+                    </div>
+          
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
   {{template "layout/foot.html" .}}
 
+  <script src="${contentPath}/plugins/ztree_v3/js/jquery.ztree.all.js"></script>
+    <script type="text/javascript" src="${contentPath}/plugins/bootstrap-select/bootstrap-select.js"></script>
+    <script type="text/javascript">
+        var resource_operat={
+            zTreeSetting:{
+                view: {
+                    selectedMulti: false,
+                    showLine: true,
+                    showText: true,
+                    showIcon: false,
+                    addHoverDom: addHoverDom,
+                    removeHoverDom: removeHoverDom,
+                    fontCss: function (treeId, treeNode) {
+                        if (treeNode.pType == 0) {
+                            return {color: "green"};
+                        } else if (treeNode.pType == 1) {
+                            return {color: "blue"};
+                        } else if (treeNode.pType == 2) {
 
+                            return {color: "red"};
+                        }
+                    }
+                }
+            },
+            zTreeObj:null,
+            appid:0,
+            Right_URL:[]
+        }
+        resource_operat.pageInit=function(){
+            $(AppIDs).each(function (i,appID) {
+                if(i==0){
+                    $(".appidSelect").append('<option value="'+appID.value+'" selected>'+appID.name+'</option>');
+                    resource_operat.AppIdchange(appID.value);
+                }else{
+                    $(".appidSelect").append('<option value="'+appID.value+'">'+appID.name+'</option>');
+                }
+            })
+            $("#rightUrl").selectpicker({
+                noneSelectedText: '未选择',
+                liveSearch: true,
+                style: 'btn-default btn-white',
+                size:20
+            });
+        }
+        resource_operat.AppIdchange=function (appid) {
+            resource_operat.appid=appid;
+            resource_operat.zTreeObj=null;
+            resource_operat.Right_URL=[];
+            resource_operat.loadTree();
+        }
+        resource_operat.loadTree=function () {
+            $.ajax({
+                url: page_content_path+ '/api/joyconn/authorize/PermissionUserRoleApi/getrighttree?appid='+resource_operat.appid,
+                type: 'get',
+                cache: false,
+                success: function (txt) {
+                    if (!joyconn_layout.ValidataResult(txt)) {
+                        return;
+                    }
+                    if (txt != '') {
+                        var node = txt.result;
+                        if (node != null) {
+                            resource_operat.FillnodeName(node,);
+                            resource_operat.zTreeObj = $.fn.zTree.init($("#RightTreePannel"), resource_operat.zTreeSetting, node);
+
+                        }
+                    }
+
+                }
+            });
+        }
+
+        //将后台输出的实体类添加name children title属性
+        resource_operat.FillnodeName = function ( node) {
+            node.name = node.pName;
+            node.tId = node.pId;
+
+            //node.children = node.Children;
+            node.title = node.pDesc;
+            if (node.pId == 0) {
+                var appName = "";
+                $(AppIDs).each(function (i,appModel) {
+                    if(appModel.value==resource_operat.appid){
+                        appName = appModel.name;
+                        return false;
+                    }
+                })
+                node.name = appName +" - "+ node.pName;
+                node.open = true;
+            } else {
+                node.open = false;
+            }
+            resource_operat.Right_URL.push(node.pPermission);
+            if (!node.children) {
+                node.children = [];
+            }
+            if (node.children.length) {
+                for (var i = 0; i < node.children.length; i++) {
+
+                    resource_operat.FillnodeName(node.children[i]);
+                }
+            }
+
+        }
+
+        //节点点击事件
+        function nodeClick  (event, treeId, treeNode) {
+
+        }
+        //为树的节点添加鼠标悬浮效果
+        function  addHoverDom  (treeId, treeNode) {
+            var sObj = $("#" + treeNode.tId + "_span");
+            if (treeNode.editNameFlag || $("#diySpanStr_" + treeNode.tId).length > 0) return;
+            var diySpanStr = "<span id='diySpanStr_" + treeNode.tId + "'>";
+            diySpanStr += "<span class='button add' id='addBtn_" + treeNode.tId + "' title='添加子权限' onfocus='this.blur();'></span>";
+            if (treeNode.Id != 0)
+                diySpanStr += "<span class='button edit' id='editBtn_" + treeNode.tId + "' title='修改权限' onfocus='this.blur();'></span>";
+            if (treeNode.children && treeNode.children.length == 0) {
+                diySpanStr += "<span class='button remove' id='removeBtn_" + treeNode.tId + "' title='删除权限' onfocus='this.blur();'></span>";
+            }
+            diySpanStr += "</span>";
+
+            sObj.after(diySpanStr);
+
+            //添加按钮
+            var addbtn = $("#addBtn_" + treeNode.tId);
+            if (addbtn) addbtn.bind("click", function () {
+                resource_operat.initPaths();
+                var path = '在"<b>' + resource_operat.getNodePath(treeNode) + '</b>"下添加新节点';
+                $("#cur_node_path").html(path);
+                $("#FuncNode_errorNote").css("display", "none");
+                $("#rightid").val("0");
+                $("#rightparentid").val(treeNode.pId);
+                // $("#rightLvL").val(treeNode.Level + 1);
+                $("#rightname").val("");
+                $("#rightUrl").selectpicker('val','')
+                $("#nodeDescribe").val("");
+                $("#nodeMenu").val(0);
+                $("#sortid").val(1);
+                $('#RightEditPannel_addbtn').unbind("click");
+                $('#RightEditPannel_addbtn').css("display", "");
+                $('#RightEditPannel_addbtn').attr("disabled", false);
+                $('#RightEditPannel_editbtn').css("display", "none");
+                var level = parseInt(treeNode.pLevel) + 1;
+                $('#RightEditPannel_addbtn').unbind("click").bind("click", function () {
+                    if ($("#rightname").val() == '') {
+                        $("#FuncNode_errorNote").css("display", "");
+                        $("#FuncNode_errorNote").find("span").html("请输入权限名");
+                        return;
+                    }
+                    var url = $("#rightUrl").selectpicker('val');
+                    if (!url) {
+                        $("#FuncNode_errorNote").css("display", "");
+                        $("#FuncNode_errorNote").find("span").html("请输入权限的资源ID");
+                        return;
+                    }
+                    $('#RightEditPannel_addbtn').attr("disabled", "disabled");
+                    var tnode = {
+                        pName: encodeURI($("#rightname").val()),
+                        pPermission: url,
+                        pPid: $("#rightparentid").val(),
+                        pDesc: encodeURI($("#nodeDescribe").val()),
+                        pType: $("#nodeMenu").val(),
+                        pLevel: level,
+                        pAppid:resource_operat.appid,
+                        pSort:$("#sortid").val()
+                    };
+
+                    $("#FuncNode_errorNote").css("display", "");
+                    $("#FuncNode_errorNote").find("span").html('<img src="/css/images/loading.gif" />');
+                    $.ajax({
+                        url:  page_content_path+'/api/joyconn/authorize/PermissionResourceApi/add',
+                        data: tnode,
+                        type: 'post',
+                        cache: false,
+                        success: function (txt) {
+                            if (!joyconn_layout.ValidataResult(txt)) {
+                                return;
+                            }
+
+                            $('#RightEditPannel_addbtn').attr("disabled", false);
+                            if (txt.result > 0) {
+
+                                var insertNodes = [];
+
+                                tnode.pId = txt.result;
+                                tnode.pName = $("#rightname").val();
+                                tnode.pDesc = $("#nodeDescribe").val();
+                                tnode.pPid = treeNode.pId;
+                                tnode.children = [];
+                                tnode.name = tnode.pName;
+                                tnode.tId = tnode.pId;
+                                tnode.title = tnode.pDesc
+                                tnode.pAppid=resource_operat.appid;
+                                tnode.pPermission = url;
+                                insertNodes.push(tnode);
+                                resource_operat.FillnodeName(insertNodes);
+                                resource_operat.zTreeObj.addNodes(treeNode, tnode, true);
+                                resource_operat.Right_URL.push(url);
+                                $("#FuncNode_errorNote").css("display", "none");
+                                resource_operat.initPaths();
+                                dialog({
+                                    title: '成功',
+                                    content: '添加成功！',
+                                    quickClose: true,
+                                    cancel: false
+                                }).showModal();
+
+                            } else if (txt.result == -2) {
+                                $("#FuncNode_errorNote").css("display", "");
+                                $("#FuncNode_errorNote").find("span").html("URl已存在，请更改");
+                            }
+                            else {
+                                $("#FuncNode_errorNote").css("display", "");
+                                $("#FuncNode_errorNote").find("span").html("添加失败");
+                            }
+                        }
+                    });
+                });
+                return false;
+            });
+            //编辑按钮
+            var editbtn = $("#editBtn_" + treeNode.tId);
+            if (editbtn) editbtn.bind("click", function () {
+                var path = '修改 "<b>' + resource_operat.getNodePath(treeNode) + '</b>"';
+                $("#cur_node_path").html(path);
+                $("#FuncNode_errorNote").css("display", "none");
+                $("#rightid").val(treeNode.pId);
+                $("#rightparentid").val(treeNode.pPid);
+                $("#rightname").val(treeNode.pName);
+                resource_operat.initPaths(treeNode.pPermission);
+                $("#nodeDescribe").val(treeNode.pDesc);
+                $('#nodeMenu').val(treeNode.pType);
+                $("#sortid").val(treeNode.pSort);
+                $('#RightEditPannel_editbtn').unbind("click");
+                $('#RightEditPannel_editbtn').css("display", "");
+                $('#RightEditPannel_editbtn').attr("disabled", false);
+                $('#RightEditPannel_addbtn').css("display", "none");
+                $('#RightEditPannel_editbtn').unbind("click").bind("click", function () {
+                    if ($("#rightname").val() == '') {
+                        $("#FuncNode_errorNote").css("display", "");
+                        $("#FuncNode_errorNote").find("span").html("请输入权限名");
+                        return;
+                    }
+                    var url = $("#rightUrl").selectpicker('val');
+                    if (!url) {
+                        $("#FuncNode_errorNote").css("display", "");
+                        $("#FuncNode_errorNote").find("span").html("请输入权限的资源ID");
+                        return;
+                    }
+                    $('#RightEditPannel_editbtn').attr("disabled", "disabled");
+
+                    $("#FuncNode_errorNote").css("display", "");
+                    $("#FuncNode_errorNote").find("span").html('<img src="/css/images/loading.gif" />');
+                    $.ajax({
+                        url: page_content_path+ '/api/joyconn/authorize/PermissionResourceApi/update',
+                        data: {
+                            pId: treeNode.pId,
+                            pName: encodeURI($("#rightname").val()),
+                            pPid: treeNode.pPid,
+                            pLevel: treeNode.pLevel,
+                            pAppid:treeNode.pAppid,
+                            pType: $('#nodeMenu').val(),
+                            pDesc: encodeURI($("#nodeDescribe").val()),
+                            pPermission: url,
+                            pSort:$("#sortid").val()
+                        },
+                        type: 'post',
+                        cache: false,
+
+                        success: function (txt) {
+                            if (!joyconn_layout.ValidataResult(txt)) {
+                                return;
+                            }
+
+                            $('#RightEditPannel_editbtn').attr("disabled", false);
+
+
+                            if (txt.result > 0) {
+                                resource_operat.Right_URL.splice($.inArray(treeNode.pPermission, resource_operat.Right_URL), 1);
+                                treeNode.name = $("#rightname").val();
+                                treeNode.pName = $("#rightname").val();
+                                treeNode.pType = $('#nodeMenu').val();
+                                treeNode.pDesc = $("#nodeDescribe").val();
+                                treeNode.pPermission = url;
+                                treeNode.title = treeNode.pDesc;
+                                resource_operat.Right_URL.push(treeNode.pPermission);
+                                $("#FuncNode_errorNote").css("display", "none");
+                                dialog({
+                                    title: '成功',
+                                    content: '修改成功！',
+                                    quickClose: true,
+                                    cancel: false
+                                }).showModal();
+                                resource_operat.zTreeObj.refresh()
+                            } else if (txt.result == -2) {
+
+                                $("#FuncNode_errorNote").css("display", "");
+                                $("#FuncNode_errorNote").find("span").html("URl已存在，请更改");
+                            }
+                            else {
+                                $("#FuncNode_errorNote").css("display", "");
+                                $("#FuncNode_errorNote").find("span").html("修改失败");
+                            }
+                        }
+                    });
+                });
+                return false;
+            });
+            //删除按钮
+            var removebtn = $("#removeBtn_" + treeNode.tId);
+            if (removebtn) removebtn.bind("click", function () {
+                var path = resource_operat.getNodePath(treeNode);
+                var d = dialog({
+                    title: '提示',
+                    content: '是否要删除"' + path + '"？',
+                    okValue: "删除",
+                    ok: function () {
+                        d.content('<img src="/css/images/loading.gif" />');
+                        $.post( page_content_path+'/api/joyconn/authorize/PermissionResourceApi/delete',
+                            {id: treeNode.pId,appid:treeNode.pAppid},
+                            function (txt) {
+                                d.close().remove();
+                                if (!joyconn_layout.ValidataResult(txt)) {
+                                    return;
+                                }
+                                if (txt.result > 0) {
+                                    dialog({
+                                        title: '成功',
+                                        content: '删除"' + path + '"成功！',
+                                        quickClose: true,
+                                        cancel: false
+                                    }).showModal();
+
+                                    resource_operat.zTreeObj.removeNode(treeNode);
+                                    for (var i in resource_operat.Right_URL) {
+                                        if (resource_operat.Right_URL[i] == treeNode.Url) {
+                                            resource_operat.Right_URL.splice(i, 1);
+                                            break;
+                                        }
+                                    }
+
+                                }
+                                else {
+                                    dialog({
+                                        title: '失败',
+                                        content: '删除"' + path + '失败！',
+                                        quickClose: true,
+                                        cancel: false
+                                    }).showModal();
+                                }
+                            }
+                        );
+                    }
+                }).showModal();
+
+                return false;
+            });
+        }
+        //为树的节点移除鼠标悬浮效果
+        function removeHoverDom (treeId, treeNode) {
+            $("#diySpanStr_" + treeNode.tId).unbind().remove();
+        }
+
+        resource_operat.initPaths=function (path) {
+            $("#rightUrl").empty();
+            if (path) {
+                $("#rightUrl").append('<option value="' + path + '" selected>' + path + '</option>');
+                $("#rightUrl").append('<option value="#" >分类</option>');
+            } else {
+                $("#rightUrl").append('<option value="#" selected>分类</option>');
+
+            }
+            $.ajax({
+                url:  page_content_path+'/api/joyconn/authorize/PermissionResourceApi/getAllPermission',
+                type: 'get',
+                cache: true,
+                success: function (result) {
+                    if (!joyconn_layout.ValidataResult(result)) {
+                        return;
+                    }
+
+
+                    if (result.result){
+
+                        for (var a = 0; a < result.result.length; a++) {
+                            var pathNode = result.result[a];
+                            if(!pathNode){continue;}
+                            for (var b = 0; b < pathNode.resources.length; b++) {
+                                var url =pathNode.resources[b] ;
+                                if ($.inArray(url, resource_operat.Right_URL) < 0 ) {
+                                    if(joyconn_layout_authorize.showUrl&&!joyconn_layout_authorize.showUrl(resource_operat.appid,pathNode.resources[b])){
+                                        continue;
+                                    }
+                                    $("#rightUrl").append('<option value="' +url + '">' + pathNode.resources[b] +'</option>');
+                                }
+                            }
+                        }
+                        $("#rightUrl").selectpicker('refresh')
+                        if (path) {
+                            $("#rightUrl").selectpicker('val',path);
+                        }else{
+                            $("#rightUrl").selectpicker('val',"");
+                        }
+                        function sideOut(url) {
+                            var urls=","
+                            +",";
+                            if(urls.toLowerCase().indexOf(","+url.toLowerCase()+",")>-1){
+                                return true;
+                            }
+                            return false;
+                        }
+
+
+                    }
+                }
+
+            });
+        }
+
+        ///url是否在存在树中
+        resource_operat.exsitUrl = function (permission) {
+            for (var node in resource_operat.Right_URL) {
+                if (resource_operat.Right_URL[node] == permission) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
+        resource_operat.getNodePath = function (treeNode) {
+            var tempnode = treeNode;
+            var path = '/' + treeNode.pName;
+            while (tempnode.getParentNode() != null) {
+                tempnode = tempnode.getParentNode();
+                path = '/' + tempnode.pName + path;
+            }
+            path = path + "/";
+            return path;
+        }
+        resource_operat.pageInit();
+    </script>
 </body>
 
 </html>
