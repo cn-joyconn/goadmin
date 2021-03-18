@@ -1,0 +1,755 @@
+{{define "admin/menu.html"}}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  {{template "layout/head.html" .}}
+  <style type="text/css">
+    td span {
+        cursor: pointer
+    }
+    .menu-data-list-ul{
+        list-style: none;
+        padding: 10px 0px;
+    }
+    .menu-data-list-ul li{
+        list-style: none;
+        border-bottom: 1px solid #f4f4f4;
+        font-size: 14px;
+        padding: 10px;
+    }
+    .menu-data-list-ul li:hover{
+        background-color: #CCCCCC;
+    }
+    .menu-data-list-ul li a{
+        color: #444444;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .menu-data-list-ul li a .btns{
+        float: right;
+        margin-right: 10px;
+     }
+    .menu-data-list-ul li a .btns i{
+        padding: 5px 5px;
+    }
+    .treetable-indent{
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        position: relative;
+    }
+    .bootstrap-tree-table .treetable-box .treetable-fixed{
+        z-index: auto;
+    }
+</style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <section class="content">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <div class="row " class="margin-left: 0px;">
+                                <div class="searchPanel form-horizontal form-inline" style="padding-left: 15px;">                                  
+                                    
+                                    <label class="control-label" style="padding-left:30px;text-align: right; ">菜单:</label>
+                                    <div class="btn-group menuIDSelect">
+                                        <button type="button" data-name="menuid" class="btn btn-default ">
+                                        </button>
+                                        <button type="button" class="btn btn-default  dropdown-toggle"     data-toggle="dropdown">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" style="max-width: 300px;">
+                                            <li class="header">
+                                                <button class="btn bg-olive btn-flat margin add_menu_btn" style="width:100%;">添加</button>
+                                            </li>
+                                            <li>
+                                                <!-- inner menu: contains the actual data -->
+                                                <ul class="menu menu-data-list-ul">
+                                                </ul>
+                                            </li>
+                                            <li class="footer">
+                                                <div id="menu_pagelist">
+                                                    <div id="menu_myPage" class="pagination pull-right"></div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+            
+                            </div>
+            
+                        </div><!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-hover menu_data_list_table table-responsive">
+            
+                                    </table>
+            
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                </div>
+            
+            </div>
+                <div class="addMenuDivTemplate" style="display: none">
+                    <drv class="row">
+                        <form class="form-horizontal">
+                            <div class="box-body">
+                                <div class="form-inline row"><label class="col-sm-3 control-label">类型：</label>
+                                    <div class="col-sm-9"><select class="feild form-control  control-block"  feildName="pType"></select></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">菜单名称：</label>
+                                    <div class="col-sm-9"><input type="text" class="feild form-control  control-block "  feildName="pName"  value=""/></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">描述：</label>
+                                    <div class="col-sm-9"><input type="text"  class="feild form-control  control-block "  feildName="pDesc" value=""/></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">排序：</label>
+                                    <div class="col-sm-9"><input type="number" class="feild form-control  control-block "  feildName="pSort" value="" /></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">图标：</label>
+                                    <div class="col-sm-9"><input type="text" class="feild form-control  control-block "  feildName="pIcon" value="" /></div>
+                                </div>
+            
+                                <div class="form-inline row"><label class="col-sm-3 control-label">状态：</label>
+                                    <div class="col-sm-9"><label><input type="checkbox" class="feild form-control  "  feildName="pState" />启用</label></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">请求地址：</label>
+                                    <div class="col-sm-9"><select class="feild form-control  control-block  selectpicker"  feildName="pUrl"></select></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">权限标识：</label>
+                                    <div class="col-sm-9"><select class="feild form-control  control-block "  feildName="pPermission"></select></div>
+                                </div>
+                                <div class="form-inline row"><label class="col-sm-3 control-label">自定义参数：</label>
+                                    <div class="col-sm-9"><input type="text" class="feild form-control  control-block "  feildName="pParams" value="" /></div>
+                                </div>
+                            </div>
+                        </form>
+                    </drv>
+            
+                </div>
+            
+            
+                <div class="col-md-12" style="display: none;overflow-y: auto;" id="MenuRightPannel">
+                    <div class="ztree">
+                    </div>
+                </div>
+            
+            
+        </section>
+            
+    </div>
+
+  {{template "layout/foot.html" .}}
+
+  <link href="${contentPath}/plugins/jquery.treegrid/css/jquery.treegrid.css" rel="stylesheet">
+  <script src="${contentPath}/plugins/jquery.treegrid/js/jquery.treegrid.min.js"></script>
+  
+  <link href="${contentPath}/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+  <script src="${contentPath}/plugins/bootstrap-table/bootstrap-table.js"></script>
+  <script src="${contentPath}/plugins/bootstrap-table/bootstrap-table-locale-all.min.js"></script>
+  <script src="${contentPath}/plugins/bootstrap-table/extensions/treegrid/bootstrap-table-treegrid.min.js"></script>
+  <script type="text/javascript">
+      /**
+       * Created by Eric.Zhang on 2016/12/31.
+       */
+      var Menu_operat = {
+          menuid: 0,
+          rootID:0,
+          pTypes_data_operat:{
+              valueNames : [
+                  {value: 1, name: '菜单'},
+                  {value: 2, name: '页面'}],
+              getName : function (value) {
+                  var result = '';
+                  $(this.valueNames).each(function (i, vn) {
+                      if (vn.value == value) {
+                          result = vn.name;
+                          return false;
+                      }
+                  });
+                  return result;
+              }
+          },
+          urlPatterns:{
+              urls:[],
+              urlPermissionMap:{}
+          }
+          ,menuModels:[]
+      }
+  
+      Menu_operat.pageInit = function () {  
+          $('.menuIDSelect .add_menu_btn').click(function () {
+              var model={
+                  pMenuID:0,
+                  pPid:0,
+                  pState:1,
+                  pType:1,
+                  pSort:0,
+                  pLevel:0
+              }
+              Menu_operat.addOrUpdateMenu(model,true,function (m) {
+                  if($('.menuIDSelect .menu-data-list-ul li').length==0){
+                      Menu_operat.MenuSelectchange(m)
+                  }
+                  Menu_operat.showMenuPage(m);
+              })
+          })
+          $(Menu_operat.pTypes_data_operat.valueNames).each(function (i,vm) {
+              $('.addMenuDivTemplate .feild[feildName="pType"]').append('<option value="'+vm.value+'" '+(i==0?'selected':'')+'>'+vm.name+'</option>');
+          })
+          Menu_operat.menuNodeUrlManage();
+      }
+      //region 头部选择内容
+
+      Menu_operat.showMenuList = function (pageIndex) {
+          var pageSize = 100;
+          $('.menuIDSelect .btn[data-name="menuid"]').attr('data-value',0).html('无');
+          Menu_operat.menuid=0;
+          $('.menuIDSelect .menu-data-list-ul').empty();
+          $('.menu_data_list_table tbody').empty();
+          $.ajax({
+              url: page_content_path + '/api/joyconn/authorize/PermissionMenuApi/getpage',
+              type: "get",
+              data: {pageIndex: pageIndex, pageSize: pageSize},
+              cache: false,
+              success: function (data) {
+                  if (joyconn_layout.ValidataResult(data)) {
+                      $(data.result).each(function (i, model) {
+                          Menu_operat.showMenuPage(model)
+                          if (i == 0) {
+                              Menu_operat.MenuSelectchange(model);
+                          }
+                      })
+                      ShowPage('menu_myPage', {
+                          pno: pageIndex,
+                          pagesize: pageSize,
+                          allcount: data.result.length
+                      }, function (pno) {
+                          Menu_operat.showMenuList(pno);
+                      });
+                  }
+  
+              }
+          });
+      }
+      Menu_operat.showMenuPage = function (model) {
+          var temp;
+          temp = $('.menuIDSelect .menu-data-list-ul li[data-value="'+model.pId+'"]');
+          if(!temp||temp.length==0){
+              temp = $(' <li>\n' +
+                  '               <a href="javascript:void(0)"><span style="padding-right: 10px;padding-left: 10px" class="menu_item_id  bg-navy "></span><span class="menu_item_name"></span>\n' +
+                  '                     <span  class="btns"><i class="fa fa-edit"></i><i class="fa fa-remove "></i></span>\n' +
+                  '               </a>\n' +
+                  '           </li>   ')
+              $('.menuIDSelect .menu-data-list-ul').append(temp);
+          }
+  
+          temp.attr('data-value', model.pId).unbind('click').click(function () {
+              if ($('.menuIDSelect .btn[data-name="menuid"]').attr('data-value') != model.pId) {
+                  Menu_operat.MenuSelectchange(model);
+              }
+          });
+          temp .find('.menu_item_id').html( 'id : '+model.pId);
+          temp .find('.menu_item_name').html( model.pName).attr('title', model.pDesc);
+          temp.find('.fa-remove').unbind('click').click(function () {
+              Menu_operat.deleteMenu(model,function (m) {
+                  temp.remove();
+                  if($('.menuIDSelect .menu-data-list-ul li').length==0){
+                      Menu_operat.MenuSelectchange({pId:0,pName:'无'})
+                  }
+              })
+              return false;
+          })
+          temp.find('.fa-edit').unbind('click').click(function () {
+              Menu_operat.addOrUpdateMenu(model,false,function (m) {
+                  Menu_operat.showMenuPage(m);
+              })
+              return false;
+          })
+      }
+  
+      Menu_operat.MenuSelectchange = function (model) {
+          $('.menuIDSelect .btn[data-name="menuid"]').attr('data-value', model.pId).html(model.pName);
+          Menu_operat.menuid = model.pId;
+          Menu_operat.showList();
+      }
+  
+  
+  
+      //endregion
+  
+  
+      //region menu内容
+  
+      Menu_operat.showList = function () {
+          if(Menu_operat.menuid>0){
+              $.ajax({
+                  url: page_content_path + '/api/joyconn/authorize/PermissionMenuApi/getMenu',
+                  type: "get",
+                  data: {menuID:Menu_operat.menuid},
+                  cache: false,
+                  success: function (data) {
+                      if (joyconn_layout.ValidataResult(data)) {
+                          var models = data.result;
+                          $(models).each(function (i,m1) {
+                              if(m1.pMenuID==0){
+                                  Menu_operat.rootID=m1.pId ;
+                                  return false;
+                              }
+                          })
+                          Menu_operat.ShowMenuNodesByTreeTable(models)
+  
+                      }
+  
+                  }
+              });
+          }
+  
+      }
+      Menu_operat.ShowMenuNodesByTreeTable = function (models){        
+          Menu_operat.menuModels=models;
+          $('.menu_data_list_table').bootstrapTable('destroy')
+          var treeTable =$('.menu_data_list_table');
+          treeTable.bootstrapTable({
+              idField: 'pId',                                                   // 选取记录返回的值,用于设置父子关系
+              parentIdField: 'pPid',                                       // 用于设置父子关系,
+              classes:'table table-bordered table-hover menu_data_list_table table-responsive treetable',
+              showColumns: true,
+              treeShowField: 'pName',
+              data:Menu_operat.menuModels,
+              columns: [
+                  [
+                  //     {
+                  //     title: 'id',
+                  //     field: 'indexxxx',
+                  //     formatter: function(value,model, index) {
+                  //     return index
+                  //     }
+                  // },
+                  {
+                  title: '菜单节点名称',
+                  field: 'pName',
+                  width: '20',
+                  colspan:1,
+                  widthUnit:'%',
+                  formatter: function(value,model, index) {
+                      if(model.pMenuID==0){
+                          return '<i class="fa fa-sitemap text-green"></i> <span class="nav-label  text-green">' + model.pName + '<br />（菜单根节点）</span>';
+                      }else{
+                          if (model.pIcon == null || model == "") {
+                              return model.pName;
+                          } else {
+                              return '<i class="' + model.pIcon + '"></i> <span class="nav-label">' + model.pName + '</span>';
+                          }
+                      }
+                      if (model.pIcon == null || model == "") {
+                          return model.pName;
+                      } else {
+                          return '<i class="' + model.pIcon + '"></i> <span class="nav-label">' + model.pName + '</span>';
+                      }
+                  }
+              },{
+                  title: '类型',
+                  field: 'pType',
+                  align: "center",
+                  colspan:1,
+                  width: '3',
+                  widthUnit:'%',
+                  formatter: function(value,model, index) {
+                      var text =  Menu_operat.pTypes_data_operat.getName(value)
+                      return ' <span class="nav-text" title="'+text+'">' + text + '</span>';
+                  }
+              },{
+                  title: '状态',
+                  field: 'pState',
+                  align: "center",
+                  colspan:1,
+                  width: '3',
+                  widthUnit:'%',
+                  formatter: function(value,model, index) {
+                      var text =   value==1?'启用':'隐藏';
+                      return ' <span class="nav-text" title="'+text+'">' + text + '</span>';
+  
+                  }
+              },{
+                  title: '排序',
+                  field: 'pSort',
+                  width: '3',
+                  colspan:1,
+                  widthUnit:'%',
+                  formatter: function(value,model, index) {
+                      return ' <span class="nav-text" title="'+value+'">' + value + '</span>';
+                  }
+              },{
+                  title: '请求地址/权限标识',
+                  field: 'pUrl',
+                  width: '25',
+                  colspan:1,
+                  widthUnit:'%',
+                  class:'ellipsis',
+                  formatter: function(value,model, index) {
+                      return ' <div class="nav-text text-primary" title="'+value+'">' + value + '</div>'
+                      +'<div class="nav-text text-muted" title="'+model.pPermission+'">' + model.pPermission + '</div>';
+                  }
+              // },{
+              //     title: '权限标识',
+              //     field: 'pPermission',
+              //     width: '20',
+              //     colspan:1,
+              //     widthUnit:'%',
+              //     class:'ellipsis',
+              //     formatter: function(value,model, index) {
+              //         return ' <span class="nav-label " title="'+value+'">' + value + '</span>';
+              //     }
+              },{
+                  title: '自定义参数',
+                  field: 'pParams',
+                  width: '11',
+                  colspan:1,
+                  widthUnit:'%',
+                  class:'ellipsis',
+                  formatter: function(value,model, index) {
+                      return ' <div class="nav-text " title="'+value+'">' + value + '</div>';
+                  }
+              },{
+                  title: '操作',
+                  field: 'operate',
+                  align: "center",
+                  colspan:1,
+                  events:'menu_table_node_click',
+                  formatter: function(value,model, index) {                    
+                      return '<span>'
+                          +'<a class="btn btn-success btn-xs edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a> '
+                          +'<a class="btn btn-info btn-xs add_btn" href="javascript:void(0)"><i class="fa fa-plus"></i>新增</a> '
+                          +'<a class="btn btn-danger btn-xs delete_btn" href="javascript:void(0)" ><i class="fa fa-remove"></i>删除</a> '
+                          +'</span>';
+                  }
+              }]]
+              ,onPostBody: function() {
+                  var columns = treeTable.bootstrapTable('getOptions').columns
+                  if (columns && columns[0][1].visible) {
+                      treeTable.treegrid({
+                          treeColumn: 1,
+                          onChange: function() {
+                              treeTable.bootstrapTable('resetView')
+                          }
+                      })
+                  }
+              }
+          });
+      }
+      window.menu_table_node_click={
+          'click .edit_btn':function(e, value, row, index){
+              var model = row;
+              Menu_operat.addOrUpdateMenu(model,false,function (m) {
+                  $(Menu_operat.menuModels).each(function (i,m1) {
+                      if(m1.pId==m.pId){
+                          Menu_operat.menuModels.splice(i,1,m);
+                          return false;
+                      }
+                  })
+                  // $('.menu_data_list_table').bootstrapTable('refresh');
+                  $('.menu_data_list_table').bootstrapTable('updateRow',{index:index,row:m});
+              })
+          }
+          ,'click .add_btn':function(e, value, row, index){
+              var model = row;
+              var addModel={
+                  pMenuID:model.pMenuID==0?model.pId:model.pMenuID,
+                  pPid:model.pId,
+                  pState:1,
+                  pSort:1,
+                  pLevel:model.pLevel+1
+              }
+              Menu_operat.addOrUpdateMenu(addModel,true,function (m) {
+                  Menu_operat.menuModels.push(m);
+                  // $('.menu_data_list_table').bootstrapTable('refresh');
+                  $('.menu_data_list_table').bootstrapTable('insertRow',{index:index,row:m});
+              })
+          }
+          ,'click .delete_btn':function(e, value, row, index){
+              var model = row;
+              Menu_operat.deleteMenu(model, function (m) {
+                  $( Menu_operat.menuModels).each(function (i,m1) {
+                      if(m1.pId==m.pId){
+                          Menu_operat.menuModels.splice(i,1)  ;
+                          return false;
+                      }
+                  })
+                  // $('.menu_data_list_table').bootstrapTable('refresh');
+                  $('.menu_data_list_table').bootstrapTable('remove',{field:'pId',values:[model.pId]});
+              });
+          }
+      }
+  
+  
+      Menu_operat.addOrUpdateMenu = function (model,isadd,callback) {
+           var disElement = $($(".addMenuDivTemplate").html());
+           var dia = dialog({
+              title: (isadd?'添加':'修改')+'菜单',
+              content: disElement,
+              width: '40em',
+              okValue:  (isadd?'添加':'修改'),
+              ok: function () {
+                  var postModel = JSON.parse(JSON.stringify(model));
+                  postModel.children=[]
+                  disElement.find('.feild').each(function (i,span) {
+                      var feildName = $(span).attr('feildName');
+                      if(feildName=='pState'){
+                          postModel[feildName]=$(span).is(':checked')?1:0;
+                      }else{
+                          postModel[feildName]=$(span).val();
+                      }
+                  })
+                  if (postModel.pName.trim().length == 0) {
+                      dialog({
+                          title: '错误',
+                          content: '菜单名称不能为空！',
+                          quickClose: true,
+                      }).show();
+                      return false;
+                  }
+                  var url = page_content_path + '/api/joyconn/authorize/PermissionMenuApi/'+(isadd?'insert':'update');
+                  $.ajax({
+                      url: url,
+                      data: postModel,
+                      type: 'post',
+                      success: function (data) {
+                          if (!joyconn_layout.ValidataResult(data)) {
+                              return;
+                          }
+                          if (data.result) {
+                              dialog({
+                                  title: '成功',
+                                  content: (isadd?'添加':'修改')+'菜单成功！',
+                                  quickClose: true,
+                              }).show();
+                              if(callback){
+                                  postModel.children=model.children;
+                                  if(isadd){
+                                      postModel.pId=data.result;
+                                  }
+                                  callback(postModel);
+                              }
+                          } else {
+                              dialog({
+                                  title: '错误',
+                                  content:(isadd?'添加':'修改')+ '菜单失败！',
+                                  quickClose: true,
+                              }).show();
+                          }
+                      }
+                  });
+              }
+          });
+          dia.showModal();
+          //region url选择框
+          $(disElement).find('select.feild[feildName="pUrl"]').empty().append('<option value="#" selected>无</option>').unbind('change').change(function () {
+              var url = $(disElement).find('select.feild[feildName="pUrl"]').val();
+              Menu_operat.initPerMissionSelect(url,disElement);
+          })
+          Menu_operat.initPerMissionSelect('#',disElement);
+          $(Menu_operat.urlPatterns.urls).each(function (i,u) {
+              $(disElement).find('select.feild[feildName="pUrl"]').append('<option value="'+u+'" >'+u+'</option>');
+          })
+          //endregion
+          disElement.find('input[type="checkbox"]').iCheck({
+              checkboxClass: 'icheckbox_square-blue',
+              radioClass: 'iradio_square-blue',
+              increaseArea: '20%' // optional
+          });
+          disElement.find('.feild').each(function (i,span) {
+              var feildName = $(span).attr('feildName');
+              if(model[feildName]!=undefined){
+                  if(feildName=='pState'){
+                      disElement.find('input[type="checkbox"]').iCheck(model[feildName]==1?'check':'uncheck');
+                  }else if(feildName=="pUrl"){
+                      $(span).val(model[feildName]);
+                      Menu_operat.initPerMissionSelect(model[feildName],disElement);
+                  }else{
+                      $(span).val(model[feildName]);
+                  }
+              }
+          })
+  
+  
+      }
+  
+  
+      Menu_operat.deleteMenu = function (model,callback) {
+          dialog({
+              title: '删除',
+              content: '您要删除'+(model.pMenuID==0?'整个':'')+'菜单:'+model.pName+'吗?',
+              width: '40em',
+              okValue: '删除',
+              ok: function () {
+                  var url = page_content_path + '/api/joyconn/authorize/PermissionMenuApi/'+(model.pMenuID==0?'deleteMenu':'deleteMenuNode');
+                  var postData=model.pMenuID==0?{
+                                              menuID:model.pId
+                                          }:{
+                                              menuID:model.pMenuID,
+                                              pId:model.pId
+                                          };
+  
+                  $.ajax({
+                      url: url,
+                      data: postData,
+                      type: 'post',
+                      success: function (data) {
+                          if (!joyconn_layout.ValidataResult(data)) {
+                              return;
+                          }
+                          if (data.result>0) {
+                              dialog({
+                                  title: '成功',
+                                  content: '添加删除成功！',
+                                  quickClose: true,
+                              }).show();
+                              if(callback){
+                                  callback(model);
+                              }
+                          } else {
+                              dialog({
+                                  title: '错误',
+                                  content: '删除菜单失败！',
+                                  quickClose: true,
+                              }).show();
+                          }
+                      }
+                  });
+              }
+          }).showModal();
+  
+      }
+      //禁用、启用菜单
+      Menu_operat.upataMenuState = function (sender, menuId) {
+          var menuModel = Menu_operat.getMenuInPage(menuId);
+          var pState = $(sender).text() == "启用" ? 1 : 0;
+          var text = $(sender).text() == "启用" ? "禁用" : "启用";
+          dialog({
+              title: $(sender).text() + '菜单',
+              okValue: $(sender).text(),
+              cancelValue: "取消",
+              cancel: true,
+              content: '确认' + $(sender).text() + '菜单吗？',
+              ok: function () {
+                  $.ajax({
+                      url: page_content_path + '/api/joyconn/authorize/PermissionMenuApi/updateState',
+                      data: {Id: menuId, state: pState},
+                      type: 'post',
+                      success: function (data) {
+                          if (!joyconn_layout.ValidataResult(data)) {
+                              return;
+                          }
+                          if (data.result > 0) {
+                              dialog({
+                                  title: '成功',
+                                  content: $(sender).text() + '菜单成功！',
+                                  quickClose: true,
+                              }).show();
+                              $(sender).text(text);
+  
+                          } else {
+                              dialog({
+                                  title: '错误',
+                                  content: $(sender).text() + '菜单失败！',
+                                  quickClose: true,
+                              }).show();
+                          }
+                      }
+                  });
+              }
+          }).showModal();
+      }
+  
+  
+      Menu_operat.menuNodeUrlManage = function () {
+          $.ajax({
+              url:  page_content_path+'/api/joyconn/authorize/PermissionResourceApi/getAllPageAction',
+              type: 'get',
+              cache: true,
+              success: function (result) {
+                  if (!joyconn_layout.ValidataResult(result)) {
+                      return;
+                  }
+                  if (result.result){
+                      var urlPermissionMap={};
+                      var urls=[];
+                      for (var a = 0; a < result.result.length; a++) {
+                          var pathNode = result.result[a];
+                          if(!pathNode){continue;}
+                          $(pathNode.patterns).each(function (i,url) {
+                              urls.push(url);
+                              urlPermissionMap[url]=pathNode.resources;
+                          })
+                      }
+                      Menu_operat.urlPatterns.urlPermissionMap = urlPermissionMap;
+                      Menu_operat.urlPatterns.urls = urls;
+  
+  
+                  }
+              }
+  
+          });
+      }
+  
+      Menu_operat.initPerMissionSelect=function (url,container) {
+          $(container).find('select.feild[feildName="pPermission"]').empty();
+          if(url=='#'){
+              $(container).find('select.feild[feildName="pPermission"]').append('<option value="" selected>无</option>')
+          }else{
+              var permissions=Menu_operat.urlPatterns.urlPermissionMap[url];
+              if(permissions&&permissions.length>0){
+                  $(permissions).each(function (i,p) {
+                      $(container).find('select.feild[feildName="pPermission"]').append('<option value="'+p+'" '+(i==0?'selected':'')+'>'+p+'</option>');
+                  })
+              }else{
+                  $(container).find('select.feild[feildName="pPermission"]').append('<option value="" selected>无</option>')
+              }
+          }
+      }
+      function FillnodeName(rightids, nodes) {
+  
+          for (var i = 0; i < nodes.length; i++) {
+  
+              nodes[i].name = nodes[i].pName;
+              // nodes[i].children = nodes[i].Children;
+              nodes[i].title = nodes[i].pDesc;
+              nodes[i].tId = nodes[i].pId;
+  
+              nodes[i].open = true;
+              if ($.inArray(nodes[i].pId + '', rightids) > -1) {
+                  nodes[i].checked = true
+                  // if(nodes[i].getParentNode()){
+                  //     nodes[i].getParentNode().open=true;
+                  // }
+              }
+              if (nodes[i].children && nodes[i].children.length > 0) {
+                  FillnodeName(rightids, nodes[i].children);
+              }
+  
+          }
+      }
+      //endregion
+  
+  
+  
+      $(function () {  
+          Menu_operat.pageInit();
+      });
+  </script>
+</body>
+
+</html>
+{{end}}

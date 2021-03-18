@@ -296,7 +296,7 @@ func (service *AdminUserService) GetUserByEmail(email string) (*adminModel.Admin
 * @param userIDs
 * @return
  */
-func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*adminModel.AdminUserBasic {
+func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) *[]adminModel.AdminUserBasic {
 	if userIDs == nil {
 		return nil
 	}
@@ -304,7 +304,7 @@ func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*admin
 	notExisitIDs := make([]int, 0)
 	var err error
 
-	result := make([]*adminModel.AdminUserBasic, 0)
+	result := make([]adminModel.AdminUserBasic, 0)
 	userIDs = joyarray.RemoveDuplicateStr(userIDs)
 	if userIDs != nil {
 		for _, userID := range userIDs {
@@ -317,7 +317,7 @@ func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*admin
 			for _, key := range cacheKeyList {
 				err = userCacheObj.Get(key, &cachedModel)
 				if err == nil {
-					result = append(result, cachedModel)
+					result = append(result, *cachedModel)
 				}
 			}
 		}
@@ -325,7 +325,7 @@ func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*admin
 			uid, _ := strconv.Atoi(userID)
 			exisit := false
 			for _, user := range result {
-				if user != nil && uid == user.ID {
+				if  uid == user.ID {
 					exisit = true
 					break
 				}
@@ -337,21 +337,22 @@ func (service *AdminUserService) GetUserInfoByUserIDS(userIDs []string) []*admin
 
 		if notExisitIDs != nil && len(notExisitIDs) > 0 {
 			var userObjs []adminModel.AdminUserBasic
-			err:=defaultOrm.DB.Select("ID", "Alias", "Sex", "HeadPortrait", "CreatedAt", "UserCD").Find(&userObjs, notExisitIDs).Error
+			err:=defaultOrm.DB.Model(&adminModel.AdminUser{}).Select("ID", "Alias", "Sex", "HeadPortrait", "CreatedAt", "UserCD").Find(&userObjs, notExisitIDs).Error
+			
 			if err == nil {
 				for _, userObj := range userObjs {
 					cacheKey := service.getUserCachekey(strconv.Itoa((&userObj).ID))
 						userCacheObj.Put(cacheKey, &userObj, 1000*60*60*24)
-						result = append(result, &userObj)
+						result = append(result, userObj)
 
 				}
 
 			}
 		}
 	}
-	return result
+	return &result
 }
-func (service *AdminUserService) GetUserRolesByUid(uid string) []*adminModel.XAdminRoleLimit {
+func (service *AdminUserService) GetUserRolesByUid(uid string) *[]*adminModel.XAdminRoleLimit {
 	cacheKey := service.getUserRoleCachekey(uid)
 	var result []*adminModel.XAdminRoleLimit
 	err := resouceCacheObj.Get(cacheKey, &result)
@@ -372,7 +373,7 @@ func (service *AdminUserService) GetUserRolesByUid(uid string) []*adminModel.XAd
 		}
 	}
 
-	return result
+	return &result
 }
 
 /**
@@ -463,7 +464,7 @@ func (service *AdminUserService) UpdateUserPubInfo(obj *adminModel.AdminUser) in
 	}
 
 }
-func (service *AdminUserService) UpdateUserRoles(uid int, userRoles []*adminModel.XAdminRoleLimit) int {
+func (service *AdminUserService) UpdateUserRoles(uid int, userRoles *[]*adminModel.XAdminRoleLimit) int {
 
 	var obj *adminModel.AdminUser
 	defaultOrm.DB.First(&obj, uid)

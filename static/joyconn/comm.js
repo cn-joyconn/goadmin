@@ -81,14 +81,15 @@ joyconn_layout.modPwd=function () {
 joyconn_layout.ValidataResult=function (data,extNote) {
     if(!data||data==""){
         return false;
-    }else if(data.code=="NoRule"){
+    }else if(data.code==100106){
         var errmsg = "";
-        if(data.errorMsg){
+        if(data.msg){
            try{
-                var msgs = JSON.parse(data.errorMsg);
+                var msgs = JSON.parse(data.msg);
                 if(msgs){                    
                     if(msgs.length>0){                        
                         errmsg += "<br />缺少如下权限：";
+                        msgs.reverse()
                         $(msgs).each(function(i,msg){
                             if(msg.length>0){
                                 errmsg += "<br />";
@@ -101,42 +102,44 @@ joyconn_layout.ValidataResult=function (data,extNote) {
                     }
                 }
            }catch(e){
-                errmsg = data.errorMsg
+                errmsg = data.msg
            }
         }
-        dialog({
+      
+        var dialog1 = JoyDialog({
             title: '访问失败',
             content: '您没有访问该数据的权限！'+errmsg,
-            quickClose: true,
-            cancel: false}).showModal();
+            buttonTextCancel:false,
+        });
         return false;
 
-    }else if(data.code=='NoLogin'||data.code=='LoginFail'){
-        dialog({
+    }else if(data.code==100201||data.code==100207||data.code==100203){
+        var dialog1 = JoyDialog({
             title: '访问失败',
             content: '您已失去登录状态！请重新登录系统！',
-            cancel: false,
-            okValue:'去登陆',
-            ok:function () {
-                window.location.href= page_content_path+'/page/account/login?ref='+encodeURIComponent(window.location.href);
+            buttonTextCancel:false,
+            buttonTextConfirm:"去登陆",
+            onClickConfirmBtn:function () {
+                window.location.href = page_content_path+'/page/account/login?ref='+encodeURIComponent(window.location.href);
             }
-        }).showModal();
+        });
         return false;
-    }else if(data.code=="ServiceError"&&!extNote){
-        dialog({
+    }else if(data.code==100105&&!extNote){
+        var dialog1 = JoyDialog({
             title: '访问失败',
             content: '服务器暂时繁忙，请联系工作人员！',
-            quickClose: true,
-            cancel: false}).showModal();
+            buttonTextCancel:false,
+        });
+       
         return false;
 
-    }else if(data.code=="ParamsError"&&!extNote){
-        var errmsg="请求的参数不正确！" + (data.errorMsg?data.errorMsg:"");
-        dialog({
+    }else if(data.code==100102&&!extNote){
+        var errmsg="请求的参数不正确！" + (data.errorMsg?data.errorMsg:"");     
+        var dialog1 = JoyDialog({
             title: '访问失败',
             content: errmsg,
-            quickClose: true,
-            cancel: false}).showModal();
+            buttonTextCancel:false,
+        });
         return false;
 
     }else{
@@ -218,18 +221,4 @@ joyconn_layout.initTipsHover=function(parent){
 }
 
 
-joyconn_layout.getMe=function(){
-    $.get(
-        page_content_path+'/api/iotcomm/ManageApi/UserManageApi/getCurUser',function (data) {
-            if(joyconn_layout.ValidataResult(data)){
-                var user=data.result.basic;
-                if(user){
-                    $("img[tag='user_photo_tag']").attr("src",user.p_imageurl);
-                    $("span[tag='user_nick_tag']").html(user.p_username);
-                    $("span[tag='user_phone_tag']").html(user.p_phonenumber);
-                }
-            }
 
-        }
-    );
-}

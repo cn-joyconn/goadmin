@@ -253,7 +253,7 @@ var adminUsers []int
 //SetSuperAdminUsers 设置超级管理员账号
 func SetSuperAdminUsers(users []int) {
 	adminUsers = make([]int, len(users))
-	copy(users, adminUsers) //users 复制给 adminUsers
+	copy(adminUsers,users) //users 复制给 adminUsers
 }
 
 //GetSuperAdminUsers 获取所有超级管理员账号

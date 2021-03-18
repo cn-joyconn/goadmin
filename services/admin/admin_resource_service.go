@@ -93,7 +93,7 @@ func (service *AdminResourceService) Insert(record *adminModel.AdminResource) in
 * @param pAppid  功能模块id
 * @return 查询结果
  */
-func (service *AdminResourceService) SelectByPrimaryKeys(pIds []int) []*adminModel.AdminResource {
+func (service *AdminResourceService) SelectByPrimaryKeys(pIds []int) *[]*adminModel.AdminResource {
 	if pIds == nil {
 		return nil
 	}
@@ -143,7 +143,7 @@ func (service *AdminResourceService) SelectByPrimaryKeys(pIds []int) []*adminMod
 			}
 		}
 	}
-	return result
+	return &result
 
 }
 
@@ -193,7 +193,7 @@ func (service *AdminResourceService) SelectBypPermission(pPermission string) *ad
 * @param pAppid  功能模块id
 * @return 查询结果
  */
-func (service *AdminResourceService) SelectBypPermissions(pPermissions []string) []*adminModel.AdminResource {
+func (service *AdminResourceService) SelectBypPermissions(pPermissions []string) *[]*adminModel.AdminResource {
 	if pPermissions == nil {
 		return nil
 	}
@@ -245,14 +245,14 @@ func (service *AdminResourceService) SelectBypPermissions(pPermissions []string)
 			}
 		}
 	}
-	return result
+	return &result
 }
 
 /**
 * 查询 所有资源信息
 * @return 查询结果
  */
-func (service *AdminResourceService) SelectAll() []*adminModel.AdminResource {
+func (service *AdminResourceService) SelectAll() *[]*adminModel.AdminResource {
 	cacheKey := service.getAllResourcesCacheKey()
 	var result []*adminModel.AdminResource
 	err := resouceCacheObj.Get(cacheKey, &result)
@@ -262,7 +262,7 @@ func (service *AdminResourceService) SelectAll() []*adminModel.AdminResource {
 			resouceCacheObj.Put(cacheKey, result, 1000*60*60*24*30)
 		}
 	}
-	return result
+	return &result
 }
 
 /**

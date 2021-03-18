@@ -98,7 +98,7 @@ func (service *AdminRoleService) SelectByPrimaryKey(pId int) *adminModel.AdminRo
 * @param pId 角色id
 * @return  未找到时返回null
  */
-func (service *AdminRoleService) SelectByRoleIds(pIds []int) []*adminModel.AdminRole {
+func (service *AdminRoleService) SelectByRoleIds(pIds []int) *[]*adminModel.AdminRole {
 	if pIds == nil {
 		return nil
 	}
@@ -148,7 +148,7 @@ func (service *AdminRoleService) SelectByRoleIds(pIds []int) []*adminModel.Admin
 			}
 		}
 	}
-	return result
+	return &result
 }
 
 /**

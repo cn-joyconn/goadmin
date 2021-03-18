@@ -124,7 +124,7 @@ func (service *AdminRoleResourceService) SelectByPrimaryKey(pId int) *adminModel
 * @param roleid 信息id
 * @return  未找到时返回null
  */
-func (service *AdminRoleResourceService) SelectByRoleID(roleid int) []int {
+func (service *AdminRoleResourceService) SelectByRoleID(roleid int) *[]int {
 	var result = make([]int, 0)
 	cacheKey := service.getRoleResourcesCacheKey(roleid)
 	err := resouceCacheObj.Get(cacheKey, &result)
@@ -139,9 +139,9 @@ func (service *AdminRoleResourceService) SelectByRoleID(roleid int) []int {
 		resouceCacheObj.Put(cacheKey, result, 1000*60*60*24)
 	}
 
-	return result
+	return &result
 }
-func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) []*adminModel.AdminRoleResource {
+func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) *[]*adminModel.AdminRoleResource {
 	if roleids == nil {
 		return nil
 	}
@@ -191,7 +191,7 @@ func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) []*admin
 			}
 		}
 	}
-	return result
+	return &result
 
 }
 
@@ -200,7 +200,7 @@ func (service *AdminRoleResourceService) SelectByRoleIDs(roleids []int) []*admin
 * @param pResource 功能资源
 * @return  未找到时返回null
  */
-func (service *AdminRoleResourceService) selectByResourceID(pResource int) []int {
+func (service *AdminRoleResourceService) selectByResourceID(pResource int) *[]int {
 	var models []adminModel.AdminRoleResource
 	var result = make([]int, 0)
 	err:=defaultOrm.DB.Where("PResource = ?", pResource).Find(&models).Error
@@ -209,5 +209,5 @@ func (service *AdminRoleResourceService) selectByResourceID(pResource int) []int
 			result = append(result, (&model).PRoleid)
 		}
 	}
-	return result
+	return &result
 }

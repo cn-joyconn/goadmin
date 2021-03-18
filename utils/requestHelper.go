@@ -75,3 +75,12 @@ func  IsAjax (ctx *gin.Context) bool{
 	}
 	return result;
 }
+//IsPage 判端是否为ajax请求
+func  IsPage (ctx *gin.Context) bool{
+	result := false
+	contenType := ctx.ContentType();
+		if strings.HasPrefix(contenType,"text/html"){
+			result = true
+		}
+	return result;
+}

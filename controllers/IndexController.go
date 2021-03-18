@@ -1,6 +1,8 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 // "fmt"
 // "os"
@@ -15,8 +17,10 @@ type IndexController struct {
 
 func (controller *IndexController) Index(c *gin.Context) {
 	data := gin.H{
-		"pageTitle": "登录",
+		"pageTitle": "首页",
 	}
+	userObj := controller.GetContextUserObj(c)
+	data["userInfo"] = userObj
 	// username, err := c.Cookie(global.AppConf.Authorize.Cookie.LoginName)
 	// if err == nil {
 	// 	data["username"] = ""

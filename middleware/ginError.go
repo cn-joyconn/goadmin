@@ -43,6 +43,7 @@ func HandleNotFound(c *gin.Context) {
 	err := JoyNotFound
 	if utils.IsAjax(c) {
 		c.JSON(err.StatusCode, err)
+		c.Abort()
 	} else {
 		baseController := &controllers.BaseController{}
 		baseController.ResponseHtmlByStatusCode(c, "layout/error_404.html", 404, gin.H{
@@ -70,12 +71,16 @@ func ErrHandler() gin.HandlerFunc {
 
 				if utils.IsAjax(c) {
 					c.JSON(Err.StatusCode, Err)
-				} else {
+					c.Abort()
+				} else if utils.IsPage(c) {
 					baseController := &controllers.BaseController{}
 					// c.Request.Response.StatusCode = 500
 					baseController.ResponseHtmlByStatusCode(c, "layout/error_500.html", 500, gin.H{
 						"pageTitle": "500错误",
 					})
+					c.Abort()
+				} else {
+					c.JSON(Err.StatusCode, "")
 					c.Abort()
 				}
 				return

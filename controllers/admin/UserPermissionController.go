@@ -66,7 +66,7 @@ func (controller *UserPermissionController) UpdateUserRolesByPrimaryKey(c *gin.C
 	//JoyConnAuthenticatePermissionUserModel record
 	var xAdminUserRoleLimit *adminModel.XAdminUserRoleLimit
 	c.ShouldBind(xAdminUserRoleLimit)
-	result := adminUserService.UpdateUserRoles(xAdminUserRoleLimit.ID, xAdminUserRoleLimit.PRoleObjs)
+	result := adminUserService.UpdateUserRoles(xAdminUserRoleLimit.ID, &xAdminUserRoleLimit.PRoleObjs)
 	if result > 0 {
 		controller.ApiSuccess(c, "修改成功", result)
 	} else {
@@ -84,7 +84,7 @@ func (controller *UserPermissionController) UpdateUserRolesByPrimaryKey(c *gin.C
 func (controller *UserPermissionController) GetUserRights(c *gin.Context) {
 	uid := controller.GetContextUserIdStr(c)
 	models := AdminUserPermissionService.GetUserResourcesList(uid)
-	controller.ApiSuccess(c, "", models)
+	controller.ApiSuccess(c, "", &models)
 }
 
 /**
@@ -97,21 +97,22 @@ func (controller *UserPermissionController) GetUserRights(c *gin.Context) {
 //  @IAuthorization(needPermission = false)
 func (controller *UserPermissionController) GetMyMenuByID(c *gin.Context) {
 	//int menuID, HttpServletRequest request
-	fId := c.PostForm("menuID")
+	fId := c.Query("menuID")
 	menuID, err1 := strconv.Atoi(fId)
 	if err1 != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
 		return
 	}
 	uid := controller.GetContextUserIdStr(c)
+	fUserid, _ := strconv.Atoi(uid)
 	permissions := AdminUserPermissionService.GetUserPermissions(uid)
 	menuModels := MenuService.SelectMenuByMenuID(menuID)
-	result := make([]*adminModel.AdminMenu, 0)
-	for _, model := range menuModels {
-		if array.InStrArray(model.PPermission, permissions) {
-			result = append(result, model)
+	result := make([]adminModel.AdminMenu, 0)
+	for _, model := range *menuModels {
+		if array.InStrArray(model.PPermission, *permissions)||global.IsSuperAdmin(fUserid) {
+			result = append(result,model)
 		}
 	}
-	controller.ApiSuccess(c, "", result)
+	controller.ApiSuccess(c, "", &result)
 
 }

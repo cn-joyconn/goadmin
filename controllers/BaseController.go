@@ -33,10 +33,7 @@ func (bc *BaseController) ResponseHtmlByStatusCode(c *gin.Context, name string, 
 	data["staticResourcesPathImage"] = global.AppConf.ImagePath
 	data["pageContentPath"] = global.AppConf.ContextPath
 	data["pageTitleSuffix"] = global.AppConf.Name
-	userObj, exit := c.Get(global.Context_UserInfo)
-	if exit {
-		data["userInfo"] = userObj
-	}
+	
 
 	c.HTML(statusCode, name, data)
 }
@@ -107,7 +104,7 @@ func (bc *BaseController) GetContextUserId(c *gin.Context) int {
 }
 func (bc *BaseController) GetContextUserIdStr(c *gin.Context) string {
 	userid := c.GetString(global.Context_UserId)
-	if !strtool.IsBlank(userid) {
+	if strtool.IsBlank(userid) {
 		userid = global.TokenHelper.GetMyAuthenticationID(c)
 		if !strtool.IsBlank(userid) {
 			c.Set(global.Context_UserId, userid)
@@ -123,12 +120,12 @@ func (bc *BaseController) GetContextUserObj(c *gin.Context) *adminModel.AdminUse
 		if !strtool.IsBlank(userid) {
 			var userids = make([]string, 1)
 			userids[0] = userid
-			models := adminUserService.GetUserInfoByUserIDS(userids)
+			models := (&adminServices.AdminUserService{}).GetUserInfoByUserIDS(userids)
 
-			if models != nil && len(models) > 0 {
+			if models != nil && len(*models) > 0 {
 				// userObj = models[0]
-				c.Set(global.Context_UserInfo, models[0])
-				return models[0]
+				c.Set(global.Context_UserInfo, (*models)[0])
+				return &((*models)[0])
 			}
 		}
 	} else {

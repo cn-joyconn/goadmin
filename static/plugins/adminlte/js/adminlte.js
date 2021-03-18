@@ -1185,12 +1185,21 @@
     _proto.createTab = function createTab(title, link, uniqueName, autoOpen) {
       var _this = this;
 
-      var tabId = "panel-" + uniqueName + "-" + Math.floor(Math.random() * 1000);
-      var navId = "tab-" + uniqueName + "-" + Math.floor(Math.random() * 1000);
-      var newNavItem = "<li class=\"nav-item\" role=\"presentation\"><a class=\"nav-link\" data-toggle=\"row\" id=\"" + navId + "\" href=\"#" + tabId + "\" role=\"tab\" aria-controls=\"" + tabId + "\" aria-selected=\"false\">" + title + "</a></li>";
-      $__default['default'](SELECTOR_TAB_NAVBAR_NAV).append(newNavItem);
-      var newTabItem = "<div class=\"tab-pane fade\" id=\"" + tabId + "\" role=\"tabpanel\" aria-labelledby=\"" + navId + "\"><iframe src=\"" + link + "\"></iframe></div>";
-      $__default['default'](SELECTOR_TAB_CONTENT).append(newTabItem);
+      // var tabId = "iframe-panel-" + uniqueName + "-" + Math.floor(Math.random() * 1000);
+      // var navId = "iframe-tab-" + uniqueName + "-" + Math.floor(Math.random() * 1000);
+      var tabId = "iframe-panel-" + uniqueName ;
+      var navId = "iframe-tab-" + uniqueName ;
+      var newNavItem = $__default['default'](SELECTOR_TAB_NAVBAR_NAV).find("#"+navId)
+      if (newNavItem.length==0){
+         newNavItem = "<li class=\"nav-item\" role=\"presentation\"><a class=\"nav-link\" data-toggle=\"row\" id=\"" + navId + "\" href=\"#" + tabId + "\" role=\"tab\" aria-controls=\"" + tabId + "\" aria-selected=\"false\">" + title + "</a></li>";
+        $__default['default'](SELECTOR_TAB_NAVBAR_NAV).append(newNavItem);
+      }
+       
+      var newTabItem = $__default['default'](SELECTOR_TAB_CONTENT).find("#"+tabId)
+      if (newTabItem.length==0){
+        newTabItem = "<div class=\"tab-pane fade\" id=\"" + tabId + "\" role=\"tabpanel\" aria-labelledby=\"" + navId + "\"><iframe src=\"" + link + "\"></iframe></div>";
+        $__default['default'](SELECTOR_TAB_CONTENT).append(newTabItem);
+      }
 
       if (autoOpen) {
         if (this._config.loadingScreen) {

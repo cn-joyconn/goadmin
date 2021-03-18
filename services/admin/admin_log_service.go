@@ -20,13 +20,16 @@ func (service *AdminLogService) Insert(record *adminModel.AdminLog) {
 }
 
 //查询日志
-func (service *AdminLogService) SelectByPage(time time.Time, pageIndex int, pageSize int) ([]*adminModel.AdminLog, int64) {
-	var result []*adminModel.AdminLog
+func (service *AdminLogService) SelectByPage(time time.Time, pageIndex int, pageSize int) (*[]adminModel.AdminLog, int64,error) {
+	var result []adminModel.AdminLog
 	var count int64
 	db := defaultOrm.DB.Where("CreatedAt < ?", time)
-	db.Model(&adminModel.AdminLog{}).Count(&count)
-	db.Order("Id desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result)
-	return result, count
+	err:=db.Model(&adminModel.AdminLog{}).Count(&count).Error
+	if err==nil{
+
+		err=db.Order("Id desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+	}
+	return &result, count,err
 }
 
 //删除日志

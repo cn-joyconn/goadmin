@@ -77,10 +77,10 @@ func (service *AdminMenuService) Insert(record *adminModel.AdminMenu) int {
 * @param pId 菜单id
 * @return  未找到时返回null
  */
-func (service *AdminMenuService) SelectMenuByID(pId int) (error,*adminModel.AdminMenu) {
+func (service *AdminMenuService) SelectMenuByID(pId int) (error, *adminModel.AdminMenu) {
 	var result adminModel.AdminMenu
-	err :=defaultOrm.DB.Where("PId = ?", pId).First(&result).Error
-	return err,&result
+	err := defaultOrm.DB.Where("PId = ?", pId).First(&result).Error
+	return err, &result
 }
 
 /**
@@ -88,22 +88,17 @@ func (service *AdminMenuService) SelectMenuByID(pId int) (error,*adminModel.Admi
 * @param menuId 菜单id
 * @return  未找到时返回null
  */
-func (service *AdminMenuService) SelectMenuByMenuID(menuId int)   []*adminModel.AdminMenu {
+func (service *AdminMenuService) SelectMenuByMenuID(menuId int) *[]adminModel.AdminMenu {
 	cacheKey := service.getMenuCacheKey(menuId)
-	var result []*adminModel.AdminMenu
+	var result []adminModel.AdminMenu
 	err := menuCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		var data []adminModel.AdminMenu
-		err=defaultOrm.DB.Where("PMenuID = ? and PState=1", menuId).Find(&data).Error
-		if err == nil { 
-			result = make([]*adminModel.AdminMenu, len(data))
-			for _,d :=range data{
-				result =append(result, &d)
-			}
-			menuCacheObj.Put(cacheKey, result, 1000*60*60*24)
+		err = defaultOrm.DB.Where("f_menu_id = ? and f_state=1", menuId).Find(&result).Error
+		if err == nil {
+			menuCacheObj.Put(cacheKey, &result, 1000*60*60*24)
 		}
 	}
-	return result
+	return &result
 }
 
 /**
@@ -115,15 +110,15 @@ func (service *AdminMenuService) SelectMenuByMenuID(menuId int)   []*adminModel.
  */
 func (service *AdminMenuService) SelectRootByPage(creatUser string, pageIndex int, pageSize int) (err error, list interface{}, total int64) {
 	var result []adminModel.AdminMenu
-	db := defaultOrm.DB
+	db := defaultOrm.DB.Where("f_menu_id = ?", 0)
 	if !strtool.IsBlank(creatUser) {
-		db = db.Where("PCreatuserid = ?", creatUser)
+		db = db.Where("f_creat_user_id = ?", creatUser)
 	}
-	err=db.Model(&adminModel.AdminMenu{}).Count(&total).Error
-	if err==nil{		
-		err=db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
+	err = db.Model(&adminModel.AdminMenu{}).Count(&total).Error
+	if err == nil {
+		err = db.Order("PId desc").Limit(pageIndex).Offset((pageIndex - 1) * pageSize).Find(&result).Error
 	}
-	return err,result, total
+	return err, result, total
 }
 
 /**
@@ -149,7 +144,7 @@ func (service *AdminMenuService) UpdateByPrimaryKey(record *adminModel.AdminMenu
 * @return 结果 1:成功 小于1:失败
  */
 func (service *AdminMenuService) DeleteByMenuID(menuID int) int64 {
-	result := defaultOrm.DB.Where("PMenuID = ?", menuID).Delete(&adminModel.AdminRoleResource{})
+	result := defaultOrm.DB.Where("f_menu_id = ?", menuID).Delete(&adminModel.AdminRoleResource{})
 	if result.RowsAffected > 0 {
 		service.removeMenuCache(menuID)
 	}
@@ -163,7 +158,7 @@ func (service *AdminMenuService) DeleteByMenuID(menuID int) int64 {
 * @return 结果 1:成功 小于1:失败
  */
 func (service *AdminMenuService) DeleteByPID(menuID int, pId int) int64 {
-	result := defaultOrm.DB.Where("PId = ? AND PMenuID = ? ", pId, menuID).Delete(&adminModel.AdminRoleResource{})
+	result := defaultOrm.DB.Where("f_id = ? AND f_menu_id = ? ", pId, menuID).Delete(&adminModel.AdminRoleResource{})
 	if result.RowsAffected > 0 {
 		service.removeMenuCache(menuID)
 	}
