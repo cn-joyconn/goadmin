@@ -186,7 +186,7 @@ func (controller *MenuController) GetMenu(c *gin.Context) {
 		return
 	}
 
-	result := MenuService.SelectMenuByMenuID(menuID)
+	result := MenuService.SelectMenuAllDataByMenuID(menuID)
 	if result != nil {
 		controller.ApiSuccess(c, "", result)
 	} else {
@@ -216,7 +216,7 @@ func (controller *MenuController) GetRootByPage(c *gin.Context) {
 		return
 	}
 	userID := controller.GetContextUserId(c)
-	if global.IsSuperAdmin(userID){
+	if global.IsSuperAdmin(userID) {
 		userID = 0
 	}
 	err, result, count := MenuService.SelectRootByPage(strconv.Itoa(userID), pageIndex, pageSize)

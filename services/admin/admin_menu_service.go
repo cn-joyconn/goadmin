@@ -50,7 +50,11 @@ func (service *AdminMenuService) UpdateStateByPrimaryKey(pId int, pState int) in
 		return 0
 	}
 	if result.RowsAffected > 0 {
-		service.removeMenuCache(pId)
+		if record.PMenuID == 0 {
+			service.removeMenuCache(record.PId)
+		} else {
+			service.removeMenuCache(record.PMenuID)
+		}
 	}
 	return result.RowsAffected
 }
@@ -66,6 +70,11 @@ func (service *AdminMenuService) Insert(record *adminModel.AdminMenu) int {
 		gologs.GetLogger("orm").Error(result.Error.Error())
 	}
 	if record.PId > 0 {
+		if record.PMenuID == 0 {
+			service.removeMenuCache(record.PId)
+		} else {
+			service.removeMenuCache(record.PMenuID)
+		}
 		return record.PId
 	} else {
 		return -1
@@ -88,19 +97,31 @@ func (service *AdminMenuService) SelectMenuByID(pId int) (error, *adminModel.Adm
 * @param menuId 菜单id
 * @return  未找到时返回null
  */
-func (service *AdminMenuService) SelectMenuByMenuID(menuId int) *[]adminModel.AdminMenu {
+func (service *AdminMenuService) SelectMenuAllDataByMenuID(menuId int) *[]adminModel.AdminMenu {
+	var result []adminModel.AdminMenu
+	err := defaultOrm.DB.Where("f_menu_id = ? ", menuId).Or("pId = ? and f_menu_id=0", menuId).Find(&result).Error
+	if err!=nil{
+		return nil
+	}
+	return &result
+}
+/**
+*获取整个菜单
+* @param menuId 菜单id
+* @return  未找到时返回null
+ */
+ func (service *AdminMenuService) SelectMenuByMenuID(menuId int) *[]adminModel.AdminMenu {
 	cacheKey := service.getMenuCacheKey(menuId)
 	var result []adminModel.AdminMenu
 	err := menuCacheObj.Get(cacheKey, &result)
 	if err != nil || result == nil {
-		err = defaultOrm.DB.Where("f_menu_id = ? and f_state=1", menuId).Find(&result).Error
+		err = defaultOrm.DB.Where("f_menu_id = ? and f_state=1", menuId).Or("pId = ? and f_menu_id=0", menuId).Find(&result).Error
 		if err == nil {
 			menuCacheObj.Put(cacheKey, &result, 1000*60*60*24)
 		}
 	}
 	return &result
 }
-
 /**
 *查询菜单
 * @param pAppid 应用id
@@ -133,7 +154,11 @@ func (service *AdminMenuService) UpdateByPrimaryKey(record *adminModel.AdminMenu
 		return 0
 	}
 	if result.RowsAffected > 0 {
-		service.removeMenuCache(record.PId)
+		if record.PMenuID == 0 {
+			service.removeMenuCache(record.PId)
+		} else {
+			service.removeMenuCache(record.PMenuID)
+		}
 	}
 	return result.RowsAffected
 }
