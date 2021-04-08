@@ -6,9 +6,9 @@ import (
 
 	"github.com/cn-joyconn/goadmin/models/global"
 	"github.com/cn-joyconn/goadmin/utils/joyCaptcha"
+	"github.com/cn-joyconn/base64Captcha"
 	"github.com/cn-joyconn/goadmin/utils/saveFile"
 	"github.com/gin-gonic/gin"
-	"github.com/mojocn/base64Captcha"
 )
 
 //通用管理

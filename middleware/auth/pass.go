@@ -1,15 +1,17 @@
 package auth
+
 import (
 	"encoding/json"
 	"net/url"
 	"strconv"
 	"strings"
 
+	controllers "github.com/cn-joyconn/goadmin/controllers"
+	"github.com/cn-joyconn/goadmin/models/admin"
 	"github.com/cn-joyconn/goadmin/models/global"
+	adminServices "github.com/cn-joyconn/goadmin/services/admin"
 	"github.com/cn-joyconn/goutils/strtool"
 	"github.com/gin-gonic/gin"
-	adminServices "github.com/cn-joyconn/goadmin/services/admin"
-	controllers "github.com/cn-joyconn/goadmin/controllers"
 )
 
 
@@ -106,7 +108,8 @@ func getAuthPass(c *gin.Context, resources []string, needPermission bool) *Valid
 			_,err := strconv.Atoi(ltID.Uid)
 			if err==nil{
 				adminUserPermissionService := &adminServices.AdminUserPermissionService{}
-				if adminUserPermissionService.PathPermissin(ltID.Uid, resources) {
+				id, _ :=  strconv.ParseUint(ltID.Uid, 10, 64)
+				if adminUserPermissionService.PathPermissin(admin.Juint64(id), resources) {
 					pass = 2
 				}
 			}			

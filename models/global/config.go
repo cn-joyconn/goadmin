@@ -1,6 +1,7 @@
 package global
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -30,7 +31,7 @@ type AppConfig struct {
 	FilePath        string            `json:"filepath" yaml:"filepath"`               //file访问路径
 	Cache           map[string]string `json:"cache" yaml:"cache"`                     //缓存catalog 及 CacheName
 	Authorize       *AuthorizeCfg      `json:"authorize" yaml:"authorize"`             //登录认证相关配置
-	SnowflakeWorkID int64             `json:"snowflakeWorkID" yaml:"snowflakeWorkID"` //全局唯一ID工作节点（雪花算法节点）
+	SnowflakeWorkID uint16             `json:"snowflakeWorkID" yaml:"snowflakeWorkID"` //全局唯一ID工作节点（雪花算法节点）0 ~ 65535
 	Upload          *UploadCfg         `json:"upload" yaml:"upload"`                   //上传文件设置
 }
 type appConfigs struct {
@@ -77,7 +78,7 @@ type DBlink struct {
 
 //DefUser 默认用户信息
 type DefUser struct {
-	ID         int    `json:"id" yaml:"id"`
+	ID         uint64 `json:"id" yaml:"id"`
 	Alias      string `json:"alias" yaml:"alias"`
 	SuperAdmin bool   `json:"superadmin" yaml:"superadmin"`
 	UserName   string `json:"username" yaml:"username"`
@@ -209,10 +210,10 @@ func LoadAdmin(configPath string) {
 			return
 		}
 		gologs.GetLogger("").Info("成功解析" + configPath + "文件")
-		users := make([]int, 0)
+		users := make([]uint64, 0)
 		for _, val := range Admins.Users {
 			if val.SuperAdmin && val.ID > 0 {
-				users = append(users, val.ID)
+				users = append(users, uint64(val.ID))
 			}
 		}
 		adminConfigPath = configPath
@@ -238,6 +239,7 @@ func SaveAppConfig() {
 func saveConfig(in interface{}, configPath string) {
 	configBytes, err := yaml.Marshal(in)
 	if err != nil {
+		fmt.Println(string(configBytes))
 		gologs.GetLogger("").Error(err.Error())
 		return
 	}
@@ -248,22 +250,26 @@ func saveConfig(in interface{}, configPath string) {
 	}
 }
 
-var adminUsers []int
+var adminUsers []uint64
 
 //SetSuperAdminUsers 设置超级管理员账号
-func SetSuperAdminUsers(users []int) {
-	adminUsers = make([]int, len(users))
+func SetSuperAdminUsers(users []uint64) {
+	adminUsers = make([]uint64, len(users))
 	copy(adminUsers,users) //users 复制给 adminUsers
 }
 
 //GetSuperAdminUsers 获取所有超级管理员账号
-func GetSuperAdminUsers() []int {
-	var users = make([]int, len(adminUsers))
+func GetSuperAdminUsers() []uint64 {
+	var users = make([]uint64, len(adminUsers))
 	copy(users, adminUsers) //adminUsers复制给users
 	return users
 }
 
 //IsSuperAdmin 是否为超级管理员
-func IsSuperAdmin(user int) bool {
-	return array.InIntArray(user, adminUsers)
+func IsSuperAdmin(user uint64) bool {
+	Contain,err := array.Contain(user, adminUsers)
+	if err!=nil{
+		return false
+	}
+	return Contain
 }

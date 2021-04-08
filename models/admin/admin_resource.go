@@ -16,3 +16,19 @@ type AdminResource struct {
 	PPermission string           `json:"pPermission" gorm:"type:varchar(200);column:f_permission;description:功能对应的权限标识"`
 	Children    []AdminResource `json:"children"    gorm:"-"`
 }
+
+type AdminResources struct {
+	Arr []AdminResource
+	By  func(p, q * AdminResource) bool
+} 
+
+func (pw AdminResources) Len() int {    // 重写 Len() 方法
+    return len(pw.Arr)
+}
+func (pw AdminResources) Swap(i, j int){     // 重写 Swap() 方法
+    pw.Arr[i], pw.Arr[j] = pw.Arr[j], pw.Arr[i]
+}
+func (pw AdminResources) Less(i, j int) bool {    // 重写 Less() 方法
+    return pw.By(&pw.Arr[i], &pw.Arr[j])
+}
+

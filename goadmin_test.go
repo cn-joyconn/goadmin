@@ -15,6 +15,7 @@ import (
 	// config "github.com/cn-joyconn/goadmin/utils/config"
 	gologs "github.com/cn-joyconn/gologs"
 	gin "github.com/gin-gonic/gin"
+	snowflake "github.com/cn-joyconn/goutils/snowflake"
 	// filetool "github.com/cn-joyconn/goutils/filetool"
 )
 
@@ -124,6 +125,8 @@ func TestLogin(t *testing.T) {
 
 func TestWeb(t *testing.T) {
 	initialize.Init(func(e *gin.Engine) bool {
+		id := snowflake.NextId()
+		fmt.Println(strconv.FormatUint(id, 16))
 		return true
 	})
 

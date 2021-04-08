@@ -2,7 +2,7 @@ package global
 
 import (
 	loginToken "github.com/cn-joyconn/goadmin/utils/loginToken"
-	snowflake "github.com/cn-joyconn/goutils/snowflake"
+	// snowflake "github.com/cn-joyconn/goutils/snowflake"
 )
 
 //不做任何操作
@@ -27,6 +27,6 @@ var AdminCatalog string
 //AdminCacheName admin缓存名称
 var AdminCacheName string
 
-var SnowflakeWorker *snowflake.Worker
+// var SnowflakeWorker *snowflake.Worker
 
 var TokenHelper *loginToken.TokenHelper 

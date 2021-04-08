@@ -154,9 +154,9 @@ func (controller *RoleController) SelectRoleListByPage(c *gin.Context) {
 		return
 	}
 	uid := controller.GetContextUserId(c)
-	creatUser := strconv.Itoa(uid)
-	if global.IsSuperAdmin(uid) {
-		creatUser = ""
+	creatUser := ""
+	if !global.IsSuperAdmin(uint64(uid)) {
+		creatUser = uid.ToString()
 	}
 	err, models, count := adminRoleService.SelectByPage(creatUser, pageindex, pagesize)
 	if err == nil {

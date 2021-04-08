@@ -127,6 +127,11 @@
     $(function () {
       $('body').addClass("sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed accent-navy text-sm");
       joyconn_layout_authorize.showMenuByID(5)
+      $.get(page_content_path +'/api/system/account/user/getMe',{},
+                        function (data) {
+                            console.info(data)
+                        }
+                    );
     })
   </script>
 </body>

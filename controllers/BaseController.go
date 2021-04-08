@@ -33,7 +33,6 @@ func (bc *BaseController) ResponseHtmlByStatusCode(c *gin.Context, name string, 
 	data["staticResourcesPathImage"] = global.AppConf.ImagePath
 	data["pageContentPath"] = global.AppConf.ContextPath
 	data["pageTitleSuffix"] = global.AppConf.Name
-	
 
 	c.HTML(statusCode, name, data)
 }
@@ -91,16 +90,16 @@ func (bc *BaseController) ApiErrorCode(c *gin.Context, msg string, data interfac
 // 	c.Redirect(route, 302)
 // }
 
-func (bc *BaseController) GetContextUserId(c *gin.Context) int {
+func (bc *BaseController) GetContextUserId(c *gin.Context) adminModel.Juint64 {
 	userid := bc.GetContextUserIdStr(c)
 	if strtool.IsBlank(userid) {
 		return 0
 	}
-	uid, err := strconv.Atoi(userid)
+	uid, err :=	 strconv.ParseUint(userid, 10, 64)
 	if err != nil {
 		return 0
 	}
-	return uid
+	return  adminModel.Juint64(uid)
 }
 func (bc *BaseController) GetContextUserIdStr(c *gin.Context) string {
 	userid := c.GetString(global.Context_UserId)

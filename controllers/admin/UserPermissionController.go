@@ -47,12 +47,13 @@ func (controller *UserPermissionController) GetMyRoles(c *gin.Context) {
 func (controller *UserPermissionController) SelectUserRoles(c *gin.Context) {
 	//int appid, String fUserid
 	fId := c.PostForm("fUserid")
-	fUserid, err1 := strconv.Atoi(fId)
+	fUserid, err1 :=  strconv.ParseUint(fId, 10, 64)
+	// fUserid, err1 := strconv.Atoi(fId)
 	if err1 != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
 		return
 	}
-	models := AdminUserPermissionService.GetUserRoles(fUserid)
+	models := AdminUserPermissionService.GetUserRoles(adminModel.Juint64(fUserid))
 	controller.ApiSuccess(c, "", models)
 }
 
@@ -82,7 +83,7 @@ func (controller *UserPermissionController) UpdateUserRolesByPrimaryKey(c *gin.C
 //  @RequestMapping(value = "getrights", method= RequestMethod.GET)
 //  @IAuthorization(needPermission = false)
 func (controller *UserPermissionController) GetUserRights(c *gin.Context) {
-	uid := controller.GetContextUserIdStr(c)
+	uid := controller.GetContextUserId(c)
 	models := AdminUserPermissionService.GetUserResourcesList(uid)
 	controller.ApiSuccess(c, "", &models)
 }
@@ -103,16 +104,18 @@ func (controller *UserPermissionController) GetMyMenuByID(c *gin.Context) {
 		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
 		return
 	}
-	uid := controller.GetContextUserIdStr(c)
-	fUserid, _ := strconv.Atoi(uid)
+	uid := controller.GetContextUserId(c)
+	// fUserid, _ := strconv.Atoi(uid)
 	permissions := AdminUserPermissionService.GetUserPermissions(uid)
 	menuModels := MenuService.SelectMenuByMenuID(menuID)
-	result := make([]adminModel.AdminMenu, 0)
+	List := make([]adminModel.AdminMenu, 0)
 	for _, model := range *menuModels {
-		if array.InStrArray(model.PPermission, *permissions)||global.IsSuperAdmin(fUserid) {
-			result = append(result,model)
+		if array.InStrArray(model.PPermission, *permissions)||global.IsSuperAdmin(uint64(uid)) {
+			List = append(List,model)
 		}
 	}
+	result := &adminModel.AdminMenu{}
+	AdminUserPermissionService.ListMenu2Tree(*result,*menuModels)
 	controller.ApiSuccess(c, "", &result)
 
 }

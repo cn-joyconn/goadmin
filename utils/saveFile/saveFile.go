@@ -10,13 +10,17 @@ import (
 	"time"
 
 	"github.com/cn-joyconn/goadmin/models/global"
+	
+	snowflake "github.com/cn-joyconn/goutils/snowflake"
 )
 
 func GetSaveFilePath(file *multipart.FileHeader, cfg *global.UploadCfg) (string, string) {
-	newID := global.SnowflakeWorker.GetId()
+	// newID := global.SnowflakeWorker.GetId()
+	newID := snowflake.NextId()
 	fullFileName := file.Filename
 	suffixName := fullFileName[strings.LastIndex(fullFileName, "."):]
-	newFileName := strconv.FormatInt(newID, 16) + suffixName
+	// newFileName := strconv.FormatInt(newID, 16) + suffixName
+	newFileName := strconv.FormatUint(newID, 16) + suffixName
 	// today := time.Now().Format("yyyyMMdd")
 	basicPath := "/" + time.Now().Format("yyyyMMdd") + "/"
 	newUploadPath := cfg.SavePath + basicPath

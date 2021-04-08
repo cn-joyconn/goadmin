@@ -210,13 +210,13 @@ func (controller *UserController) ModifyUserModel(c *gin.Context) {
  */
 func (controller *UserController) ChangeUserStat(c *gin.Context) {
 	uid := c.PostForm("uid")
-	id, err1 := strconv.Atoi(uid)
+	id, err1 :=  strconv.ParseUint(uid, 10, 64)
 	stat := c.PostForm("stat")
 	state, err2 := strconv.Atoi(stat)
 	if err1 != nil || err2 != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.ParamsError)
 	}
-	updateResult := adminUserService.UpdateUserState(id, state)
+	updateResult := adminUserService.UpdateUserState(adminModel.Juint64(id), state)
 	controller.ApiSuccess(c, "", updateResult)
 
 }
@@ -234,19 +234,19 @@ func (controller *UserController) ModifyPwd(c *gin.Context) {
 	pwd := c.PostForm("pwd")
 	npwd := c.PostForm("npwd")
 	uid := controller.GetContextUserId(c)
-	userModel, err := adminUserService.GetUserByUserID(strconv.Itoa(uid))
+	userModel, err := adminUserService.GetUserByUserID(uid.ToString())
 	if err != nil {
 		controller.ApiErrorCode(c, "参数错误", "", global.VerifyFail)
 		return
 	}
-	pwd = adminUserService.GetSaltPwd(pwd)
+	pwd = adminUserService.GetSaltPwd(uid,pwd)
 	if pwd != userModel.Password {
 		controller.ApiErrorCode(c, "参数错误", "", global.VerifyFail)
 		return
 	}
 	updateResult := adminUserService.UpdateUserPassword(uid, npwd)
 	if updateResult > 0 {
-		global.TokenHelper.ClearAuthenticationToken(strconv.Itoa(uid))
+		global.TokenHelper.ClearAuthenticationToken(uid.ToString())
 	}
 	controller.ApiSuccess(c, "", updateResult)
 
@@ -292,10 +292,11 @@ func (controller *UserController) ModifyUserPhoto(c *gin.Context) {
 //  @IAuthorization(needPermission = true,resources = {"api:iotdata:account:user:resetPwd"})
 func (controller *UserController) ResetPwd(c *gin.Context) {
 	uid := c.PostForm("uid")
-	id, _ := strconv.Atoi(uid)
+	id, _ :=  strconv.ParseUint(uid, 10, 64)
+	// id, _ := strconv.Atoi(uid)
 	pwd := c.PostForm("pwd")
-
-	updateResult := adminUserService.UpdateUserPassword(id, adminUserService.GetSaltPwd(pwd))
+	juid := adminModel.Juint64(id)
+	updateResult := adminUserService.UpdateUserPassword(juid, adminUserService.GetSaltPwd(juid, pwd))
 	if updateResult > 0 {
 		global.TokenHelper.ClearAuthenticationToken(uid)
 	}

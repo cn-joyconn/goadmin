@@ -5,7 +5,7 @@ import (
 
 	// global "github.com/cn-joyconn/goadmin/models/global"
 	"fmt"
-	"strconv"
+	// "strconv"
 	"time"
 
 	adminModel "github.com/cn-joyconn/goadmin/models/admin"
@@ -96,7 +96,7 @@ func (controller *AccountController) loginApi(c *gin.Context, byCookie bool) {
 	}
 	if code == global.LoginSucess {
 		// tokenHelper := &loginToken.TokenHelper{}
-		global.TokenHelper.SetAuthenticationToken(strconv.Itoa(adminUserModel.ID), adminUserModel.Password, c, byCookie)
+		global.TokenHelper.SetAuthenticationToken(adminUserModel.ID.ToString(), adminUserModel.Password, c, byCookie)
 		controller.ApiSuccess(c, "登录成功", adminUserModel)
 
 	} else {

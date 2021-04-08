@@ -6,6 +6,7 @@ import (
 	"github.com/cn-joyconn/goadmin/models/global"
 	"github.com/cn-joyconn/goadmin/utils/loginToken"
 	gocache "github.com/cn-joyconn/gocache"
+	snowflake "github.com/cn-joyconn/goutils/snowflake"
 )
 
 
@@ -34,6 +35,8 @@ type myMakeUUid struct{
 
 } 
 func ( mmu *myMakeUUid)CreatID() string {
-	id:=global.SnowflakeWorker.GetId()
-	return strconv.FormatInt(id, 16)
+	// id:=global.SnowflakeWorker.GetId()
+	// return strconv.FormatInt(id, 16)
+	id:=snowflake.NextId()
+	return strconv.FormatUint(id, 16)
 }

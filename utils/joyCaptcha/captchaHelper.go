@@ -4,9 +4,9 @@ import (
 	"image/color"
 	"strings"
 
+	"github.com/cn-joyconn/base64Captcha"
 	"github.com/cn-joyconn/goadmin/models/global"
 	gocache "github.com/cn-joyconn/gocache"
-	"github.com/mojocn/base64Captcha"
 )
 
 //configJsonBody json request body.

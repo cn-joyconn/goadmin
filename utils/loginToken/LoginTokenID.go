@@ -33,8 +33,8 @@ func ParseLoginTokenID(tokenStr string, token_ekey string) *LoginTokenID {
 	if err != nil {
 		return nil
 	}
-	bytes := encrypt.AesDecryptCBC(x4, []byte(token_ekey))
-	if len(bytes) == 0 {
+	bytes,err2 := encrypt.AesDecryptCBC(x4, []byte(token_ekey))
+	if err2!=nil&&len(bytes) == 0 {
 		return nil
 	}
 	var loginTokenID *LoginTokenID

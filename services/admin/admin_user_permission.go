@@ -1,14 +1,16 @@
 package admin
 
 import (
-	"strconv"
+	"sort"
+	// "strconv"
 
 	adminModel "github.com/cn-joyconn/goadmin/models/admin"
 	// adminServices "github.com/cn-joyconn/goadmin/services/admin"
 	global "github.com/cn-joyconn/goadmin/models/global"
 	// gologs "github.com/cn-joyconn/gologs"
 	// joyarray "github.com/cn-joyconn/goutils/array"
-	strtool "github.com/cn-joyconn/goutils/strtool"
+	"github.com/cn-joyconn/goutils/array"
+	// strtool "github.com/cn-joyconn/goutils/strtool"
 )
 
 type AdminUserPermissionService struct {
@@ -20,7 +22,7 @@ type AdminUserPermissionService struct {
 * @param uid
 * @return
  */
-func (service *AdminUserPermissionService) GetUserRoles(uid int) *[]*adminModel.AdminRole {
+func (service *AdminUserPermissionService) GetUserRoles(uid adminModel.Juint64) *[]*adminModel.AdminRole {
 	roleids := service.GetUserRoleIDs(uid)
 	if roleids != nil && len(*roleids) > 0 {
 		adminRoleService := &AdminRoleService{}
@@ -37,7 +39,7 @@ func (service *AdminUserPermissionService) GetUserRoles(uid int) *[]*adminModel.
 * @param uid
 * @return
  */
-func (service *AdminUserPermissionService) GetUserRoleIDs(uid int) *[]int {
+func (service *AdminUserPermissionService) GetUserRoleIDs(uid adminModel.Juint64) *[]int {
 	if uid < 0 {
 		return nil
 	}
@@ -46,7 +48,7 @@ func (service *AdminUserPermissionService) GetUserRoleIDs(uid int) *[]int {
 	// }
 	result := make([]int, 0)
 	adminUserService := &AdminUserService{}
-	userRolesModels := adminUserService.GetUserRolesByUid(strconv.Itoa(uid))
+	userRolesModels := adminUserService.GetUserRolesByUid(uid.ToString())
 	if userRolesModels != nil && len(*userRolesModels) > 0 {
 		for _, roleLimitTimeModel := range *userRolesModels {
 			if roleLimitTimeModel != nil && roleLimitTimeModel.IsEffectiveTime() {
@@ -63,20 +65,20 @@ func (service *AdminUserPermissionService) GetUserRoleIDs(uid int) *[]int {
 * @param uid
 * @return
  */
-func (service *AdminUserPermissionService) GetUserResources(userid string) *[]*adminModel.AdminResource {
-	if strtool.IsBlank(userid) {
-		return nil
-	}
-	uid, err := strconv.Atoi(userid)
-	if err != nil {
-		return nil
-	}
+func (service *AdminUserPermissionService) GetUserResources(userid adminModel.Juint64) *[]*adminModel.AdminResource {
+	// if strtool.IsBlank(userid) {
+	// 	return nil
+	// }
+	// uid, err := strconv.Atoi(userid)
+	// if err != nil {
+	// 	return nil
+	// }
 	adminResourceService := &AdminResourceService{}
-	if global.IsSuperAdmin(uid) {
+	if global.IsSuperAdmin(uint64(userid)) {
 		return (adminResourceService.SelectAll())
 	}
 	var result []*adminModel.AdminResource
-	roleIDs := service.GetUserRoleIDs(uid)
+	roleIDs := service.GetUserRoleIDs(userid)
 	if roleIDs != nil && len(*roleIDs) > 0 {
 		adminRoleResourceService := &AdminRoleResourceService{}
 		resourceList := make([]int, 0)
@@ -105,17 +107,17 @@ func (service *AdminUserPermissionService) GetUserResources(userid string) *[]*a
 * @param uid
 * @return
  */
-func (service *AdminUserPermissionService) GetUserResourceIDs(userid string) *[]int {
-	if strtool.IsBlank(userid) {
-		return nil
-	}
-	uid, err := strconv.Atoi(userid)
-	if err != nil {
-		return nil
-	}
+func (service *AdminUserPermissionService) GetUserResourceIDs(userid adminModel.Juint64) *[]int {
+	// if strtool.IsBlank(userid) {
+	// 	return nil
+	// }
+	// uid, err := strconv.Atoi(userid)
+	// if err != nil {
+	// 	return nil
+	// }
 	result := make([]int, 0)
 	adminResourceService := &AdminResourceService{}
-	if global.IsSuperAdmin(uid) {
+	if global.IsSuperAdmin(uint64(userid)) {
 		resourceList := adminResourceService.SelectAll()
 		for _, resourceObj := range *resourceList {
 			if resourceObj != nil {
@@ -125,7 +127,7 @@ func (service *AdminUserPermissionService) GetUserResourceIDs(userid string) *[]
 		return &result
 	}
 
-	roleIDs := service.GetUserRoleIDs(uid)
+	roleIDs := service.GetUserRoleIDs(userid)
 	if roleIDs != nil && len(*roleIDs) > 0 {
 		adminRoleResourceService := &AdminRoleResourceService{}
 		var resourceIds []int
@@ -145,7 +147,7 @@ func (service *AdminUserPermissionService) GetUserResourceIDs(userid string) *[]
 	}
 	return nil
 }
-func (service *AdminUserPermissionService) GetUserPermissions(userid string) *[]string {
+func (service *AdminUserPermissionService) GetUserPermissions(userid adminModel.Juint64) *[]string {
 	models := service.GetUserResources(userid)
 	result := make([]string, 0)
 	if models != nil {
@@ -164,7 +166,7 @@ func (service *AdminUserPermissionService) GetUserPermissions(userid string) *[]
 * @param uid
 * @return
  */
-func (service *AdminUserPermissionService) GetUserResourcesList(uid string) *[]*adminModel.AdminResource {
+func (service *AdminUserPermissionService) GetUserResourcesList(uid adminModel.Juint64) *[]*adminModel.AdminResource {
 	// result :=&adminModel.AdminResource{
 	// 	PId: 0,
 	// 	PDesc: "",
@@ -185,7 +187,7 @@ func (service *AdminUserPermissionService) GetUserResourcesList(uid string) *[]*
 * @param uid
 * @return
  */
-func (service *AdminUserPermissionService) GetUserResourcesListForMenu(uid string) *[]*adminModel.AdminResource {
+func (service *AdminUserPermissionService) GetUserResourcesListForMenu(uid adminModel.Juint64) *[]*adminModel.AdminResource {
 	// result :=&adminModel.AdminResource{
 	// 	PId: 0,
 	// 	PDesc: "",
@@ -230,22 +232,22 @@ func (service *AdminUserPermissionService) GetUserResourcesListForMenu(uid strin
 * @param resuorces
 * @return
  */
-func (service *AdminUserPermissionService) PathPermissin(userid string, resuorces []string) bool {
-	if strtool.IsBlank(userid) {
-		return false
-	}
-	uid, err := strconv.Atoi(userid)
-	if err != nil {
-		return false
-	}
-	if global.IsSuperAdmin(uid) {
+func (service *AdminUserPermissionService) PathPermissin(userid adminModel.Juint64, resuorces []string) bool {
+	// if strtool.IsBlank(userid) {
+	// 	return false
+	// }
+	// uid, err := strconv.Atoi(userid)
+	// if err != nil {
+	// 	return false
+	// }
+	if global.IsSuperAdmin(uint64(userid)) {
 		return true
 	}
 	if resuorces == nil || len(resuorces) == 0 {
 		return false
 	}
 	// JoyConnAuthenticatePermissionResourceModel joyConnAuthenticatePermissionResourceModel = null;
-	roleIDs := service.GetUserRoleIDs(uid)
+	roleIDs := service.GetUserRoleIDs(userid)
 	if roleIDs == nil || len(*roleIDs) == 0 {
 		return false
 	}
@@ -278,22 +280,22 @@ func (service *AdminUserPermissionService) PathPermissin(userid string, resuorce
 * @param resuorces
 * @return
  */
-func (service *AdminUserPermissionService) HasPathPermissin(userid string, resuorces []string) []string {
+func (service *AdminUserPermissionService) HasPathPermissin(userid adminModel.Juint64, resuorces []string) []string {
 	permission := make([]string, 0)
-	if strtool.IsBlank(userid) {
-		return permission
-	}
-	uid, err := strconv.Atoi(userid)
-	if err != nil {
-		return permission
-	}
-	if global.IsSuperAdmin(uid) {
+	// if userid==nil {
+	// 	return permission
+	// }
+	// uid, err := strconv.Atoi(userid)
+	// if err != nil {
+	// 	return permission
+	// }
+	if global.IsSuperAdmin(uint64(userid)) {
 		return resuorces
 	}
 	if resuorces == nil || len(resuorces) == 0 {
 		return permission
 	}
-	roleIDs := service.GetUserRoleIDs(uid)
+	roleIDs := service.GetUserRoleIDs(userid)
 	if roleIDs == nil || len(*roleIDs) == 0 {
 		return permission
 	}
@@ -319,74 +321,76 @@ func (service *AdminUserPermissionService) HasPathPermissin(userid string, resuo
 	return permission
 }
 
-// public static JoyConnAuthenticatePermissionResourceModel list2Tree(JoyConnAuthenticatePermissionResourceModel root, List<JoyConnAuthenticatePermissionResourceModel> ResourceList) {
-// 	ResourceList.sort((a, b)-> {if(a.getPLevel().equals(b.getPLevel())){return a.getpSort()-b.getpSort();}else{return a.getPLevel()-b.getPLevel();}});
-// 	for (JoyConnAuthenticatePermissionResourceModel node1 : ResourceList) {
-// 		if (node1 != null) {
-// 			if (node1.getPPid().equals(0)) {//一级节点
-// 				root.getChildren().add(node1);
-// 			} else {//非一级节点
-// 				for (JoyConnAuthenticatePermissionResourceModel node2 : ResourceList) {
-// 					if (node2 != null) {
-// 						if (node2.getPId().equals(node1.getPPid())) {
-// 							if (node2.getChildren() == null) {
-// 								node2.setChildren(new ArrayList<>());
-// 							}
-// 							if (!node2.getChildren().contains(node1)) {
-// 								node2.getChildren().add(node1);
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
+func (service *AdminUserPermissionService)ListResource2Tree( root adminModel.AdminResource,  ResourceList []adminModel.AdminResource) {
+	//var aa = 
+	sort.Sort(adminModel.AdminResources{ResourceList,func (a, b *adminModel.AdminResource) bool {
+		if a.PLevel==b.PLevel{
+			return a.PSort>b.PSort
+		}else{
+			return a.PLevel>b.PLevel
+		}
+    }} )
+	for _, node1 :=range ResourceList {
+		if node1.PPid == 0 {//一级节点
+			root.Children = append(root.Children,node1);
+	   } else {//非一级节点
+		   for _, node2 := range ResourceList {
+			if node2.PId==node1.PPid {
+				if node2.Children == nil {
+					node2.Children=make([]adminModel.AdminResource, 0)
+				}
+				Contain,err:= array.Contain(node1,node2.Children)
+				if err==nil && Contain {
+					node2.Children = append(node2.Children,node1);
+				}
+			}
+		   }
+	   }
+	}
+}
 
-// 		}
-// 	}
-// 	return root;
-// }
+func    (service *AdminUserPermissionService)ListMenu2Tree(root adminModel.AdminMenu, menuList []adminModel.AdminMenu)  {
+	sort.Sort(adminModel.AdminMenus{menuList, func (a, b *adminModel.AdminMenu) bool {
+		if a.PLevel==b.PLevel{
+			return a.PSort>b.PSort
+		}else{
+			return a.PLevel>b.PLevel
+		}
+    }})
+	for _, node1 :=range menuList {
+		if node1.PPid == root.PId {//一级节点
+			root.Children = append(root.Children,node1);
+	   } else {//非一级节点
+		   for _, node2 := range menuList {
+			if node2.PId==node1.PPid {
+				if node2.Children == nil {
+					node2.Children=make([]adminModel.AdminMenu, 0)
+				}
+				Contain,err:= array.Contain(node1,node2.Children)
+				if err==nil && Contain {
+					node2.Children = append(node2.Children,node1);
+				}
+			}
+		   }
+	   }
+	}
+	
+}
+func  (service *AdminUserPermissionService)removeEmptyNode(model adminModel.AdminMenu){
+	if model.Children !=nil && len(model.Children)>0{
+		var  childModel adminModel.AdminMenu
+		var length = len(model.Children) 
+		for i:=0;i<length;{
+			childModel= model.Children[i];
+			if childModel.PType==1{
+				service.removeEmptyNode(childModel);
+			}
+			if childModel.PType==2||(childModel.Children!=nil&&len(childModel.Children)>0){
+				i++;
+			}else{
+				model.Children =append(model.Children[:i], model.Children[i+1:]...) 
+			}
+		}
 
-// public  static JoyConnAuthenticatePermissionMenuModel list2Tree(JoyConnAuthenticatePermissionMenuModel root, List<JoyConnAuthenticatePermissionMenuModel> menuList) {
-// 	menuList.sort((a, b)-> a.getpSort()-b.getpSort());
-// 	for (JoyConnAuthenticatePermissionMenuModel node1 : menuList) {
-// 		if (node1 != null) {
-// 			if (node1.getPPid().equals(root.getPId())) {//一级节点
-// 				if(root.getChildren()==null){
-// 					root.setChildren(new ArrayList<>());
-// 				}
-// 				root.getChildren().add(node1);
-// 			} else {//非一级节点
-// 				for (JoyConnAuthenticatePermissionMenuModel node2 : menuList) {
-// 					if (node2 != null) {
-// 						if (node2.getPId().equals(node1.getPPid())) {
-// 							if (node2.getChildren() == null) {
-// 								node2.setChildren(new ArrayList<>());
-// 							}
-// 							if (!node2.getChildren().contains(node1)) {
-// 								node2.getChildren().add(node1);
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-
-// 		}
-// 	}
-// 	return root;
-// }
-// func  (service *AdminUserPermissionService)removeEmptyNode(model *adminModel.AdminMenu){
-// 	if model.Children !=nil && len(model.Children)>0{
-// 		JoyConnAuthenticatePermissionMenuModel childModel;
-// 		for(int i=0;i<model.getChildren().size();){
-// 			childModel= model.getChildren().get(i);
-// 			if(childModel.getpType()==1){
-// 					removeEmptyNode(childModel);
-// 			}
-// 			if(childModel.getpType()==2||(childModel.getChildren()!=null&&childModel.getChildren().size()>0)){
-// 				i++;
-// 			}else{
-// 				model.getChildren().remove(i);
-// 			}
-// 		}
-
-// 	}
-// }
+	}
+}

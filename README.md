@@ -19,8 +19,8 @@
 |--routers              路由  
 |--services             业务层 
 |--static               静态文件 
+|--templates            视图模板
 |--utils                工具类库
-|--view                 视图模板
 |--main.go              主函数
 ```
 

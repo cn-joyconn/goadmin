@@ -216,10 +216,10 @@ func (controller *MenuController) GetRootByPage(c *gin.Context) {
 		return
 	}
 	userID := controller.GetContextUserId(c)
-	if global.IsSuperAdmin(userID) {
+	if global.IsSuperAdmin(uint64(userID)) {
 		userID = 0
 	}
-	err, result, count := MenuService.SelectRootByPage(strconv.Itoa(userID), pageIndex, pageSize)
+	err, result, count := MenuService.SelectRootByPage(userID.ToString(), pageIndex, pageSize)
 	if err == nil {
 		controller.ApiDataList(c, "", result, count)
 	} else {

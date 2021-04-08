@@ -6,7 +6,7 @@ import (
 
 //AdminUserBasic 实体类
 type AdminUserBasic struct {
-	ID           int       `json:"pUserID"          gorm:"primaryKey;autoIncrement;column:f_id;comment:用户ID"`
+	ID           Juint64   `json:"pUserID"          gorm:"primaryKey;type:bigint;column:f_id;comment:用户ID"`
 	Alias        string    `json:"pAlias"           gorm:"type:varchar(30);column:f_alias;comment:昵称"`
 	Sex          int       `json:"pSex"             gorm:"default:0;column:f_sex;comment:性别0（未知） 1（男） 2（女）"`
 	HeadPortrait string    `json:"pHeadPortrait"    gorm:"type:varchar(200);column:f_head_portrait;comment:用户头像"`
